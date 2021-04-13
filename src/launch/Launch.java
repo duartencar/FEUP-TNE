@@ -32,8 +32,36 @@ public class Launch extends Boot {
         }
     }
 
-    public static void main(String[] args) {
+    /**
+     * Receives the map name and searches for the folder
+     * ./data/maps/<mapName> and reads the nodes and edges
+     * files inside.
+     * @param mapName - name of the folder where the map files are
+     */
+    private static void loadMap(String mapName) {
 
+    }
+
+    /**
+     * Receives the parameters file name and searches for it in
+     * ./data/simulations/.
+     * @param agentsFile - name of the files with agent parameters
+     */
+    private static void loadAndStartAgents(String agentsFile) {
+
+    }
+
+    private static void checkParameters(String[] args) {
+        if(args.length != 3) {
+            System.out.println("Expected 3 arguments: <-gui?> <mapFolderName> <simulationFile>");
+            System.exit(0);
+        }
+    }
+
+    public static void main(String[] args) {
+        checkParameters(args);
         createSimulationContainer(args[0].equals("-" + Profile.GUI));
+        loadMap(args[1]);
+        loadAndStartAgents(args[2]);
     }
 }
