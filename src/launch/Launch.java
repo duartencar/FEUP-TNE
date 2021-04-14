@@ -9,6 +9,8 @@ import jade.wrapper.ContainerController;
 
 import java.util.Properties;
 
+import static utils.Constants.Arguments.*;
+
 public class Launch extends Boot {
     private static ProfileImpl simulationProfile;
     private static ContainerController simulationContainerController;
@@ -60,8 +62,8 @@ public class Launch extends Boot {
 
     public static void main(String[] args) {
         checkParameters(args);
-        createSimulationContainer(args[0].equals("-" + Profile.GUI));
-        loadMap(args[1]);
-        loadAndStartAgents(args[2]);
+        createSimulationContainer(args[ARGUMENT_GUI_INDEX].equals("-" + Profile.GUI));
+        loadMap(args[ARGUMENT_MAP_INDEX]);
+        loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX]);
     }
 }
