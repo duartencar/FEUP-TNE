@@ -1,4 +1,5 @@
 package map;
 
-public class GraphNode {
+public class GraphNode extends GraphElement {
+
 }

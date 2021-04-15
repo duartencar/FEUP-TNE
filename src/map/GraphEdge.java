@@ -1,4 +1,5 @@
 package map;
 
-public class GraphEdge {
+public class GraphEdge extends GraphElement {
+
 }
