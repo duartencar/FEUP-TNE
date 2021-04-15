@@ -49,6 +49,9 @@ public class Graph {
                 Element element = (Element) vertex;
 
                 String id = element.getAttribute("id");
+                String x = element.getAttribute("positionX");
+                String y = element.getAttribute("positionY");
+
                 System.out.println(id);
             }
         }

@@ -19,8 +19,8 @@ class UtilsTest {
         int nLines = 0;
 
         while(file.hasNextLine()) {
+            file.nextLine();
             nLines++;
-            System.out.println(file.nextLine());
         }
 
         assertEquals(2, nLines, "The number of lines should be 2");
@@ -28,7 +28,7 @@ class UtilsTest {
 
     @Test
     void openAndParseXmlFile() {
-        final Document testFile = Utils.openAndParseXmlFile("C:\\Users\\dnc18\\OneDrive\\Ambiente de Trabalho\\Projectos\\FEUP-TNE\\test\\resources\\testGraph.xml");
+        final Document testFile = Utils.openAndParseXmlFile("test/resources/testGraph.xml");
 
         assertNotNull(testFile, "Should return a Document class");
 
