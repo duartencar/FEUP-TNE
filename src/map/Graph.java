@@ -7,16 +7,18 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.List;
 
+import static utils.Utils.log;
+
 public class Graph {
     ArrayList<GraphNode> nodes;
-    ArrayList<GraphEdge> edges;
+    ArrayList<GraphElement> elements;
     private boolean valid;
 
     private static Graph instance = null;
 
     private Graph() {
         nodes = new ArrayList<GraphNode>();
-        edges = new ArrayList<GraphEdge>();
+        elements = new ArrayList<GraphElement>();
         valid = false;
     }
 
@@ -33,12 +35,34 @@ public class Graph {
     }
 
     private boolean processEdges(NodeList edges) {
+        if(edges == null || edges.getLength() == 0) {
+            log("Node list empty");
+            return false;
+        }
+
+        for(int i = 0; i < edges.getLength(); i++) {
+            Node edge = edges.item(i);
+
+            if (edge.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) edge;
+
+                String id = element.getAttribute("id");
+                String source = element.getAttribute("source");
+                String target = element.getAttribute("target");
+                String weight = element.getAttribute("weight");
+
+                GraphEdge newEdge = new GraphEdge(id, source, target, weight);
+
+                this.nodes.add(new GraphNode(id, x, y, name));
+            }
+        }
+
         return true;
     }
 
     private boolean processNodes(NodeList nodes) {
         if(nodes == null || nodes.getLength() == 0) {
-            System.out.println("Node list empty");
+            log("Node list empty");
             return false;
         }
 
@@ -53,9 +77,13 @@ public class Graph {
                 String y = element.getAttribute("positionY");
                 String name = element.getAttribute("mainText");
 
-                this.nodes.add(new GraphNode(id, x, y, name));
+                GraphNode newNode = new GraphNode(id, x, y, name);
+
+                this.nodes.add(newNode);
+                this.elements.add(newNode);
             }
         }
+
         return true;
     }
 
