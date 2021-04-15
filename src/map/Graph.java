@@ -51,8 +51,9 @@ public class Graph {
                 String id = element.getAttribute("id");
                 String x = element.getAttribute("positionX");
                 String y = element.getAttribute("positionY");
+                String name = element.getAttribute("mainText");
 
-                System.out.println(id);
+                this.nodes.add(new GraphNode(id, x, y, name));
             }
         }
         return true;

@@ -16,6 +16,22 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class Utils {
 
+    public static int convertToInteger (String number) throws NumberFormatException {
+        return Integer.parseInt(number);
+    }
+
+    public static short convertToShort (String number) throws NumberFormatException {
+        return Short.parseShort(number);
+    }
+
+    public static float convertToFloat (String number) throws NumberFormatException {
+        return Float.parseFloat(number);
+    }
+
+    public static void log(String str) {
+        System.out.println(str);
+    }
+
     public static Scanner getFileReference(final String filePath) {
 
         File f;
