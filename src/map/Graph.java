@@ -1,5 +1,7 @@
 package map;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
@@ -30,15 +32,30 @@ public class Graph {
         return valid;
     }
 
-    private boolean processEdges() {
+    private boolean processEdges(NodeList edges) {
         return true;
     }
 
-    private boolean processNodes() {
+    private boolean processNodes(NodeList nodes) {
+        if(nodes == null || nodes.getLength() == 0) {
+            System.out.println("Node list empty");
+            return false;
+        }
+
+        for(int i = 0; i < nodes.getLength(); i++) {
+            Node vertex = nodes.item(i);
+
+            if (vertex.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) vertex;
+
+                String id = element.getAttribute("id");
+                System.out.println(id);
+            }
+        }
         return true;
     }
 
     public boolean init(NodeList nodes, NodeList edges) {
-        return true;
+        return processNodes(nodes) && processEdges(edges);
     }
 }
