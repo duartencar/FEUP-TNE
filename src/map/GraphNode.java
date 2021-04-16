@@ -1,12 +1,15 @@
 package map;
 
+import java.util.ArrayList;
+
 import static utils.Utils.*;
 
 public class GraphNode extends GraphElement {
 
     private short x;
     private short y;
-    private String name;
+    final private String name;
+    ArrayList<GraphEdge> edges;
 
     public GraphNode(String id, String x, String y, String name) {
         super(id);
@@ -22,10 +25,22 @@ public class GraphNode extends GraphElement {
         }
 
         this.name = name;
+
+        edges = new ArrayList<GraphEdge>();
+    }
+
+    public boolean addEdge(GraphEdge newEdge) {
+        if(this.getId() != newEdge.getOrigin().getId()) {
+            return false;
+        }
+
+        edges.add(newEdge);
+
+        return true;
     }
 
     @Override
     public String toString() {
-        return "ID: " + id + " (" + x + "," + y + ") Name: " + name;
+        return "ID: " + getId() + " (" + x + "," + y + ") Name: " + name;
     }
 }

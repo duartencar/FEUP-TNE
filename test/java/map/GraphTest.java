@@ -32,6 +32,14 @@ class GraphTest {
 
         Graph a = Graph.getInstance();
 
-        a.init(nodeList, edgeList);
+        assertFalse(a.isValid(), "Graph should be invalid because it hasn't been initialized");
+
+        assertTrue(a.init(nodeList, edgeList), "Initialization should have returned true");
+
+        assertTrue(a.isValid(), "Graph should be invalid because it hasn't been initialized");
+
+        assertEquals(nodeList.getLength(), a.getNumberOfNodes(), "The number of nodes in graph should be the number of parsed nodes");
+
+        assertEquals(edgeList.getLength(), a.getNumberOfEdges(), "The number of edges in graph should be the number of parsed nodes");
     }
 }
