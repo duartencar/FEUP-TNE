@@ -40,6 +40,6 @@ class GraphTest {
 
         assertEquals(nodeList.getLength(), a.getNumberOfNodes(), "The number of nodes in graph should be the number of parsed nodes");
 
-        assertEquals(edgeList.getLength(), a.getNumberOfEdges(), "The number of edges in graph should be the number of parsed nodes");
+        assertEquals(edgeList.getLength() * 2, a.getNumberOfEdges(), "The number of edges in graph should be the number of parsed nodes");
     }
 }

@@ -1,5 +1,6 @@
 package map;
 
+import map.search.DijkstraGraph;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -11,8 +12,8 @@ import static utils.Utils.convertToInteger;
 import static utils.Utils.log;
 
 public class Graph {
-    HashMap<Integer, GraphNode> nodes;
-    LinkedList<GraphElement> elements;
+    public HashMap<Integer, GraphNode> nodes;
+    public LinkedList<GraphElement> elements;
     private boolean valid;
 
     private static Graph instance = null;
@@ -60,14 +61,20 @@ public class Graph {
                     return false;
                 }
 
-                GraphEdge newEdge = new GraphEdge(id, start, end, weight);
+                GraphEdge outGoing = new GraphEdge(id, start, end, weight);
+                GraphEdge inGoing = new GraphEdge(id, end, start, weight);
 
-                if(!start.addEdge(newEdge)) {
+                if(!start.addEdge(outGoing)) {
+                    log("Edge assign to wrong node");
+                    return false;
+                }
+                if(!end.addEdge(inGoing)) {
                     log("Edge assign to wrong node");
                     return false;
                 }
 
-                this.elements.add(newEdge);
+                this.elements.add(outGoing);
+                this.elements.add(inGoing);
             }
         }
 
@@ -110,6 +117,15 @@ public class Graph {
         }
 
         return true;
+    }
+
+
+    public DijkstraGraph getGraphToSearch() {
+        if(valid) {
+            return new DijkstraGraph(nodes);
+        }
+
+        return null;
     }
 
     public int getNumberOfNodes() {
