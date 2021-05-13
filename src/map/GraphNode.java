@@ -9,7 +9,7 @@ public class GraphNode extends GraphElement {
     private short x;
     private short y;
     final private String name;
-    ArrayList<GraphEdge> edges;
+    private ArrayList<GraphEdge> edges;
 
     public GraphNode(String id, String x, String y, String name) {
         super(id);
@@ -37,6 +37,10 @@ public class GraphNode extends GraphElement {
         edges.add(newEdge);
 
         return true;
+    }
+
+    public ArrayList<GraphEdge> getEdges() {
+        return edges;
     }
 
     @Override

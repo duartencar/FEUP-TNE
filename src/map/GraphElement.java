@@ -18,6 +18,10 @@ public abstract class GraphElement implements Comparable<GraphElement> {
         }
     }
 
+    public GraphElement(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
