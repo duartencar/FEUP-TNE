@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<experiment>
+    <agent name="van1" type="eletric" tank="300" capacity="50" pathFinding="Dijkstra" />
+    <agent name="van2" type="gas" tank="500" capacity="40" pathFinding="Dijkstra" />
+    <agent name="van2" type="gas" tank="600" capacity="45" pathFinding="Dijkstra" />
+</experiment>
