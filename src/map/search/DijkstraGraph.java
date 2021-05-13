@@ -76,6 +76,10 @@ public class DijkstraGraph {
                 continue;
             }
 
+            if(aux.equals(last)) {
+                break;
+            }
+
             //log("Visiting " + aux.getId());
 
             for(DijkstraEdge edge : aux.getEdges()) {
