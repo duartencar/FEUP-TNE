@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<graphml>
   <graph id="Graph" uidGraph="68" uidEdge="11196">
     <node positionX="90" positionY="65" id="0" mainText="0" upText="" size="30" />
     <node positionX="100" positionY="201" id="1" mainText="1" upText="" size="30" />
@@ -166,4 +165,3 @@
     <edge source="58" target="28" isDirect="false" weight="5" useWeight="true" id="11194" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
     <edge source="25" target="51" isDirect="false" weight="2" useWeight="true" id="11195" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
   </graph>
-</graphml>
