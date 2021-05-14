@@ -26,7 +26,3 @@ out/*
 
 APDescription.txt
 MTPs-Main-Container.txt
-
-#idea settings folder
-.idea
-.idea/*
