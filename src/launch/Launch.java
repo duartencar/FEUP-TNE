@@ -6,10 +6,16 @@ import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.util.ExtendedProperties;
 import jade.wrapper.ContainerController;
+import map.Graph;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import utils.Utils;
 
 import java.util.Properties;
 
 import static utils.Constants.Arguments.*;
+import static utils.Constants.Directories.MAPS_PATH;
+import static utils.Utils.log;
 
 public class Launch extends Boot {
     private static ProfileImpl simulationProfile;
@@ -40,8 +46,25 @@ public class Launch extends Boot {
      * files inside.
      * @param mapName - name of the folder where the map files are
      */
-    private static void loadMap(String mapName) {
+    private static boolean loadMap(String mapName) {
+        String mapPath = MAPS_PATH + "/" + mapName + "/" + mapName + ".xml";
 
+        final Document mapFile = Utils.openAndParseXmlFile(mapPath);
+
+        if(mapFile == null) {
+            log("Couldn't open file");
+            return false;
+        }
+
+        NodeList nodeList = mapFile.getElementsByTagName("node");
+
+        NodeList edgeList = mapFile.getElementsByTagName("edge");
+
+        Graph a = Graph.getInstance();
+
+        a.init(nodeList, edgeList);
+
+        return a.isValid();
     }
 
     /**
@@ -62,8 +85,11 @@ public class Launch extends Boot {
 
     public static void main(String[] args) {
         checkParameters(args);
+        if(!loadMap(args[ARGUMENT_MAP_INDEX])) {
+            log("Couldn't load Graph. Shutting down...");
+            System.exit(0);
+        }
         createSimulationContainer(args[ARGUMENT_GUI_INDEX].equals("-" + Profile.GUI));
-        loadMap(args[ARGUMENT_MAP_INDEX]);
         loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX]);
     }
 }

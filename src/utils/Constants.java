@@ -9,8 +9,8 @@ public final class Constants {
     }
 
     public final class Directories {
-        public static final String MAPS_PATH = "../data/maps/";
-        public static final String SIMULATIONS_PATH = "../data/simulations/";
-        public static final String RESULTS_PATH = "../data/results/";
+        public static final String MAPS_PATH = "data/maps/";
+        public static final String SIMULATIONS_PATH = "data/simulations/";
+        public static final String RESULTS_PATH = "data/results/";
     }
 }
