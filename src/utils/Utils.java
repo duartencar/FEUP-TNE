@@ -92,4 +92,8 @@ public class Utils {
             return null;
         }
     }
+
+    public static void print(String name, String s) {
+        System.err.println(name + ": " + s);
+    }
 }
