@@ -43,4 +43,17 @@ public class Path {
     public ArrayList<GraphNode> getNodes() {
         return nodes;
     }
+
+    @Override
+    public String toString() {
+        String toReturn = "";
+
+        for(int i = 0; i < nodes.size() - 1; i++) {
+            toReturn += nodes.get(i).getId() + " -> ";
+        }
+
+        toReturn += nodes.get(nodes.size() - 1).getId();
+
+        return toReturn;
+    }
 }
