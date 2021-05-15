@@ -8,6 +8,8 @@ import jade.util.ExtendedProperties;
 import jade.wrapper.ContainerController;
 import map.Graph;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import utils.Utils;
 
@@ -15,6 +17,7 @@ import java.util.Properties;
 
 import static utils.Constants.Arguments.*;
 import static utils.Constants.Directories.MAPS_PATH;
+import static utils.Constants.Directories.SIMULATIONS_PATH;
 import static utils.Utils.log;
 
 public class Launch extends Boot {
@@ -52,7 +55,7 @@ public class Launch extends Boot {
         final Document mapFile = Utils.openAndParseXmlFile(mapPath);
 
         if(mapFile == null) {
-            log("Couldn't open file");
+            log("Couldn't open " + mapPath);
             return false;
         }
 
@@ -67,13 +70,81 @@ public class Launch extends Boot {
         return a.isValid();
     }
 
+    private static int parseVehicleAgents(Document agentsFile) {
+        NodeList agentsList = agentsFile.getElementsByTagName("vehicle");
+        int numberOfAgents = 0;
+
+        for(int i = 0; i < agentsList.getLength(); i++) {
+            Node agent = agentsList.item(i);
+
+            if(agent.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) agent;
+
+                String name = element.getAttribute("name");
+                String vehicleType = element.getAttribute("type");
+                String tank = element.getAttribute("tank");
+                String capacity = element.getAttribute("capacity");
+                String pathFindingAlgorithm = element.getAttribute("pathFinding");
+                String startNode = element.getAttribute("startNode");
+
+                if(name.equals("") || vehicleType.equals("") || tank.equals("") || capacity.equals("") || pathFindingAlgorithm.equals("")) {
+                    log("Element in line " + i + " is invalid " + element.getBaseURI().toString());
+                    continue;
+                }
+
+                /*
+                VehicleAgent vehicle = new VehicleAgent(name, vehicleType, tank, capacity, pathFindingAlgorithm, startNode);
+                simulationContainerController.acceptNewAgent(name, vehicle);
+                */
+                numberOfAgents++;
+            }
+        }
+
+        return numberOfAgents;
+    }
+
+    private static int parseRequesterAgents(Document agentsFile) {
+        NodeList agentsList = agentsFile.getElementsByTagName("requester");
+        int numberOfAgents = 0;
+
+        for(int i = 0; i < agentsList.getLength(); i++) {
+            Node agent = agentsList.item(i);
+
+            if(agent.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) agent;
+
+                String name = element.getAttribute("name");
+                String random = element.getAttribute("random");
+                String numberOfRequests = element.getAttribute("numberOfRequests");
+                String requestFile = element.getAttribute("requestFile");
+
+                /*
+                RequesterAgent requester = new RequesterAgent(name, random, numberOfRequests, requestFile);
+                simulationContainerController.acceptNewAgent(name, requester);
+                */
+                numberOfAgents++;
+            }
+        }
+
+        return numberOfAgents;
+    }
+
     /**
      * Receives the parameters file name and searches for it in
      * ./data/simulations/.
      * @param agentsFile - name of the files with agent parameters
      */
-    private static void loadAndStartAgents(String agentsFile) {
+    private static boolean loadAndStartAgents(String agentsFile) {
+        String agentsFilePath = SIMULATIONS_PATH + agentsFile + ".xml";
 
+        final Document agentsDoc = Utils.openAndParseXmlFile(agentsFilePath);
+
+        if(agentsDoc == null) {
+            log("Couldn't open " + agentsFilePath);
+            return false;
+        }
+
+        return parseVehicleAgents(agentsDoc) > 0 && parseRequesterAgents(agentsDoc) > 0;
     }
 
     private static void checkParameters(String[] args) {
@@ -84,12 +155,21 @@ public class Launch extends Boot {
     }
 
     public static void main(String[] args) {
+        
         checkParameters(args);
+
         if(!loadMap(args[ARGUMENT_MAP_INDEX])) {
             log("Couldn't load Graph. Shutting down...");
             System.exit(0);
         }
+
         createSimulationContainer(args[ARGUMENT_GUI_INDEX].equals("-" + Profile.GUI));
-        loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX]);
+
+        if(loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
+            log("Problem with agents file");
+            System.exit(0);
+        }
+
+        return;
     }
 }
