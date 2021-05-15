@@ -4,12 +4,14 @@ import logic.Request;
 import map.Graph;
 import map.GraphNode;
 import map.Path;
+import utils.Utils;
 
 import java.util.ArrayList;
 
 public class Vehicle extends Elementary{
     private final GraphNode startPos;
-    private final Graph simulationGraph;
+    private final String type;
+    private final String name;
     private Path currentPath;
     private final double tankSize;
     private final double maxCapacity;
@@ -17,25 +19,30 @@ public class Vehicle extends Elementary{
     private double profit;
     private ArrayList<Request> requests;
 
-    public Vehicle(GraphNode sp, Graph sg, double ts, double mc) {
+    public String getVehicleName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Vehicle(String n, String t, GraphNode sp, double ts, double mc) {
+        name = n;
+        type = t;
         startPos = sp;
-        simulationGraph = sg;
         tankSize = ts;
         maxCapacity = mc;
         profit = 0;
         currentLoad = 0;
         currentPath = null;
         requests = new ArrayList<Request>();
-        //TODO: nao me lembro como se regista, tenho que ver isto
-        //super.registerInYellowPages()
+        if (!super.registerInYellowPages(type, name))
+            Utils.print(name,"Failed to register to yellow pages services");
     }
 
     public GraphNode getStartPos() {
         return startPos;
-    }
-
-    public Graph getSimulationGraph() {
-        return simulationGraph;
     }
 
     public Path getCurrentPath() {
