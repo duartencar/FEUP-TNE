@@ -11,6 +11,7 @@ public final class Constants {
     public final class Directories {
         public static final String MAPS_PATH = "data/maps/";
         public static final String SIMULATIONS_PATH = "data/simulations/";
+        public static final String SIMULATIONS_DATA_PATH = "data/simulations/simulationFiles";
     }
 
     public final class AgentsProperties {
