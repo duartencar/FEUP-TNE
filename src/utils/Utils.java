@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import java.util.Random;
 import java.util.Scanner;
 
 import org.w3c.dom.Document;
@@ -30,6 +31,10 @@ public class Utils {
 
     public static void log(String str) {
         System.out.println(str);
+    }
+
+    public static int generateInt(int upper) {
+        return new Random().nextInt(upper);
     }
 
     public static Scanner getFileReference(final String filePath) {

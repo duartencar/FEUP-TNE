@@ -1,5 +1,6 @@
 package launch;
 
+import agents.RequestAgent;
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -118,11 +119,16 @@ public class Launch extends Boot {
                 String numberOfRequests = element.getAttribute("numberOfRequests");
                 String requestFile = element.getAttribute("requestFile");
 
-                /*
-                RequesterAgent requester = new RequesterAgent(name, random, numberOfRequests, requestFile);
-                simulationContainerController.acceptNewAgent(name, requester);
-                */
-                numberOfAgents++;
+
+                RequestAgent requester = null;
+                try {
+                    requester = new RequestAgent(i, name, random, random.equals("1") ? numberOfRequests : requestFile);
+                    simulationContainerController.acceptNewAgent(name, requester);
+                    numberOfAgents++;
+                } catch (Exception e) {
+                    log(e.getMessage());
+                    continue;
+                }
             }
         }
 
