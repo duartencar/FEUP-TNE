@@ -10,6 +10,7 @@ import org.w3c.dom.NodeList;
 import utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static utils.Constants.AgentsProperties.RequestAgent.*;
 import static utils.Constants.Directories.SIMULATIONS_DATA_PATH;
@@ -20,13 +21,13 @@ public class RequestAgent extends Elementary {
     final private int id;
     final private String agentName;
     final private int mode;
-    final private ArrayList<Request> requests;
+    final private HashMap<Integer, Request> requests;
 
     public RequestAgent(int id, String name, String randomRequests, String fileOrNumberOfRequests) throws Exception {
         this.id=id;
         agentName = name;
         mode = convertToInteger(randomRequests);
-        requests = new ArrayList<Request>(1);
+        requests = new HashMap<Integer, Request>();
 
         switch (mode) {
             case FILE_MODE:
@@ -82,7 +83,9 @@ public class RequestAgent extends Elementary {
                         return false;
                     }
 
-                    requests.add(generateRequest(i, numberOfBoxes,destinationNode,deliveryTime));
+                    Request toAdd = generateRequest(i, numberOfBoxes,destinationNode,deliveryTime);
+
+                    requests.put(toAdd.getId(), toAdd);
 
                 } catch(NumberFormatException e) {
                     log("Couldn't parse one argument of the request in line " + (i + 1));
@@ -104,7 +107,7 @@ public class RequestAgent extends Elementary {
 
         for (int i = 0; i < numberOfRequestsToGenerate; i++) {
             Request newRequest = generateRequest(i,1 + generateInt(8), g.getRandomLocation(), "1200");
-            requests.add(newRequest);
+            requests.put(newRequest.getId(), newRequest);
         }
     }
 
