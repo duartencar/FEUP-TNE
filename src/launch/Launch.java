@@ -1,6 +1,7 @@
 package launch;
 
 import agents.RequestAgent;
+import gui.DistributedLogistics;
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -162,7 +163,7 @@ public class Launch extends Boot {
 
     public static void main(String[] args) {
         
-        checkParameters(args);
+        /*checkParameters(args);
 
         if(!loadMap(args[ARGUMENT_MAP_INDEX])) {
             log("Couldn't load Graph. Shutting down...");
@@ -174,7 +175,10 @@ public class Launch extends Boot {
         if(!loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
             log("Problem with agents file");
             System.exit(0);
-        }
+        }*/
+
+        DistributedLogistics d = new DistributedLogistics();
+        log("gui");
 
         return;
     }
