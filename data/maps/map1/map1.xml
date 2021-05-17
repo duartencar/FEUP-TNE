@@ -3,7 +3,7 @@
     <node positionX="90" positionY="65" id="0" mainText="0" upText="" size="30" />
     <node positionX="100" positionY="201" id="1" mainText="1" upText="" size="30" />
     <node positionX="89" positionY="332" id="2" mainText="2" upText="" size="30" />
-    <node positionX="98" positionY="482" id="3" mainText="3" upText="" size="30" />
+    <node positionX="98" positionY="482" id="3" mainText="3" upText="" size="30" special="HQ"/>
     <node positionX="323" positionY="488" id="4" mainText="4" upText="" size="30" />
     <node positionX="504" positionY="475" id="5" mainText="5" upText="" size="30" />
     <node positionX="601" positionY="402" id="6" mainText="6" upText="" size="30" />
@@ -12,7 +12,7 @@
     <node positionX="1009" positionY="350" id="9" mainText="9" upText="" size="30" />
     <node positionX="1077" positionY="199" id="10" mainText="10" upText="" size="30" />
     <node positionX="1040" positionY="72" id="11" mainText="11" upText="" size="30" />
-    <node positionX="945" positionY="40" id="12" mainText="12" upText="" size="30" />
+    <node positionX="945" positionY="40" id="12" mainText="12" upText="" size="30" special="GS"/>
     <node positionX="699" positionY="44" id="13" mainText="13" upText="" size="30" />
     <node positionX="485" positionY="24" id="14" mainText="14" upText="" size="30" />
     <node positionX="369" positionY="44" id="15" mainText="15" upText="" size="30" />
@@ -96,7 +96,7 @@
     <edge source="28" target="10" isDirect="false" weight="5" useWeight="true" id="11125" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
     <edge source="9" target="10" isDirect="false" weight="8" useWeight="true" id="11126" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
     <edge source="10" target="11" isDirect="false" weight="4" useWeight="true" id="11127" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
-    <edge source="11" target="12" isDirect="false" weight="20" useWeight="true" id="11128" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
+    <edge source="11" target="12" isDirect="false" weight="30" useWeight="true" id="11128" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
     <edge source="12" target="13" isDirect="false" weight="30" useWeight="true" id="11129" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
     <edge source="13" target="14" isDirect="false" weight="5" useWeight="true" id="11130" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
     <edge source="22" target="46" isDirect="false" weight="3" useWeight="true" id="11131" text="" upText="" arrayStyleStart="" arrayStyleFinish="" model_width="4" model_type="0" model_curvedValue="0.1" />
