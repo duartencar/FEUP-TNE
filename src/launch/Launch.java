@@ -1,5 +1,6 @@
 package launch;
 
+import agents.RequestAgent;
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -28,11 +29,11 @@ public class Launch extends Boot {
     private static void createSimulationContainer(boolean gui) {
         simulationProperties = new ExtendedProperties();
 
-        simulationProfile = new ProfileImpl((jade.util.leap.Properties) simulationProperties);
-
         if(gui) {
             simulationProperties.setProperty(Profile.GUI, "true");
         }
+
+        simulationProfile = new ProfileImpl((jade.util.leap.Properties) simulationProperties);
 
         Runtime.instance().setCloseVM(true);
 
@@ -116,13 +117,18 @@ public class Launch extends Boot {
                 String name = element.getAttribute("name");
                 String random = element.getAttribute("random");
                 String numberOfRequests = element.getAttribute("numberOfRequests");
-                String requestFile = element.getAttribute("requestFile");
+                String requestFile = element.getAttribute("requestsFile");
 
-                /*
-                RequesterAgent requester = new RequesterAgent(name, random, numberOfRequests, requestFile);
-                simulationContainerController.acceptNewAgent(name, requester);
-                */
-                numberOfAgents++;
+
+                RequestAgent requester = null;
+                try {
+                    requester = new RequestAgent(i, name, random, random.equals("1") ? numberOfRequests : requestFile);
+                    simulationContainerController.acceptNewAgent(name, requester);
+                    numberOfAgents++;
+                } catch (Exception e) {
+                    log(e.getMessage());
+                    continue;
+                }
             }
         }
 
@@ -165,7 +171,7 @@ public class Launch extends Boot {
 
         createSimulationContainer(args[ARGUMENT_GUI_INDEX].equals("-" + Profile.GUI));
 
-        if(loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
+        if(!loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
             log("Problem with agents file");
             System.exit(0);
         }
