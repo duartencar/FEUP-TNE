@@ -29,11 +29,11 @@ public class Launch extends Boot {
     private static void createSimulationContainer(boolean gui) {
         simulationProperties = new ExtendedProperties();
 
-        simulationProfile = new ProfileImpl((jade.util.leap.Properties) simulationProperties);
-
         if(gui) {
             simulationProperties.setProperty(Profile.GUI, "true");
         }
+
+        simulationProfile = new ProfileImpl((jade.util.leap.Properties) simulationProperties);
 
         Runtime.instance().setCloseVM(true);
 
@@ -117,7 +117,7 @@ public class Launch extends Boot {
                 String name = element.getAttribute("name");
                 String random = element.getAttribute("random");
                 String numberOfRequests = element.getAttribute("numberOfRequests");
-                String requestFile = element.getAttribute("requestFile");
+                String requestFile = element.getAttribute("requestsFile");
 
 
                 RequestAgent requester = null;
@@ -171,7 +171,7 @@ public class Launch extends Boot {
 
         createSimulationContainer(args[ARGUMENT_GUI_INDEX].equals("-" + Profile.GUI));
 
-        if(loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
+        if(!loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
             log("Problem with agents file");
             System.exit(0);
         }
