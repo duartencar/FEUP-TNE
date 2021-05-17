@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-public class Elementary extends Agent {
+public abstract class Elementary extends Agent {
     protected ArrayList<AID> logisticsAgents;
     protected boolean registerServices(ArrayList<ServiceDescription> serviceDescriptions){
         DFAgentDescription agentDescription = new DFAgentDescription();
@@ -32,11 +32,11 @@ public class Elementary extends Agent {
         return true;
     }
 
-    public ArrayList<AID> getAgencyAgents() {
+    public ArrayList<AID> getLogisticsAgents() {
         return logisticsAgents;
     }
 
-    public void setAgencyAgents(ArrayList<AID> logisticsAgents) {
+    public void setLogisticsAgents(ArrayList<AID> logisticsAgents) {
         this.logisticsAgents = logisticsAgents;
     }
 
