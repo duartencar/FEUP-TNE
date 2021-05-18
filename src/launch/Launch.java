@@ -2,30 +2,42 @@ package launch;
 
 import agents.RequestAgent;
 import gui.DistributedLogistics;
+import agents.Vehicle;
+
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.util.ExtendedProperties;
+import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
+
 import map.Graph;
+import map.GraphNode;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
+import utils.Utils;
 import static utils.Constants.Arguments.*;
 import static utils.Constants.Directories.MAPS_PATH;
 import static utils.Constants.Directories.SIMULATIONS_PATH;
-import static utils.Utils.log;
+import static utils.Utils.*;
+import static utils.Utils.convertToFloat;
 
 public class Launch extends Boot {
     private static ProfileImpl simulationProfile;
     private static ContainerController simulationContainerController;
     private static Properties simulationProperties;
+
+    private static ArrayList<Vehicle> vehicleAgents;
+    private static ArrayList<AgentController> agentsController;
 
     private static void createSimulationContainer(boolean gui) {
         simulationProperties = new ExtendedProperties();
@@ -43,6 +55,8 @@ public class Launch extends Boot {
         } else {
             simulationContainerController = Runtime.instance().createAgentContainer(simulationProfile);
         }
+
+        agentsController = new ArrayList<AgentController>();
     }
 
     /**
@@ -74,6 +88,10 @@ public class Launch extends Boot {
 
     private static int parseVehicleAgents(Document agentsFile) {
         NodeList agentsList = agentsFile.getElementsByTagName("vehicle");
+
+        vehicleAgents = new ArrayList<Vehicle>(agentsList.getLength());
+
+
         int numberOfAgents = 0;
 
         for(int i = 0; i < agentsList.getLength(); i++) {
@@ -94,11 +112,22 @@ public class Launch extends Boot {
                     continue;
                 }
 
-                /*
-                VehicleAgent vehicle = new VehicleAgent(name, vehicleType, tank, capacity, pathFindingAlgorithm, startNode);
-                simulationContainerController.acceptNewAgent(name, vehicle);
-                */
-                numberOfAgents++;
+                GraphNode startPos = Graph.getInstance().nodes.get(convertToInteger(startNode));
+
+                if(startPos == null) {
+                    log("Element in line " + i + " has an invalid starting position");
+                    continue;
+                }
+
+                try {
+                    Vehicle vehicle = new Vehicle(name, vehicleType, startPos, convertToFloat(tank), convertToFloat(capacity));
+                    vehicleAgents.add(vehicle);
+                    agentsController.add(simulationContainerController.acceptNewAgent(name, vehicle));
+                    numberOfAgents++;
+                } catch (Exception e) {
+                    log("ERROR PARSING VEHICLE: " + e.getMessage());
+                    continue;
+                }
             }
         }
 
@@ -124,7 +153,7 @@ public class Launch extends Boot {
                 RequestAgent requester = null;
                 try {
                     requester = new RequestAgent(i, name, random, random.equals("1") ? numberOfRequests : requestFile);
-                    simulationContainerController.acceptNewAgent(name, requester);
+                    agentsController.add(simulationContainerController.acceptNewAgent(name, requester));
                     numberOfAgents++;
                 } catch (Exception e) {
                     log(e.getMessage());
@@ -161,9 +190,20 @@ public class Launch extends Boot {
         }
     }
 
+    private static void startAgents() {
+        for(AgentController controller : agentsController) {
+            try {
+                controller.start();
+            } catch (StaleProxyException e) {
+                log("Couldn't start agent");
+                log(e.getMessage());
+            }
+        }
+    }
+
     public static void main(String[] args) {
         
-        /*checkParameters(args);
+        checkParameters(args);
 
         if(!loadMap(args[ARGUMENT_MAP_INDEX])) {
             log("Couldn't load Graph. Shutting down...");
@@ -175,10 +215,12 @@ public class Launch extends Boot {
         if(!loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
             log("Problem with agents file");
             System.exit(0);
-        }*/
+        }
 
         DistributedLogistics d = new DistributedLogistics();
         log("gui");
+
+        startAgents();
 
         return;
     }
