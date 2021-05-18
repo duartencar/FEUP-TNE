@@ -1,33 +1,26 @@
 package agents;
 
 import logic.Request;
-import map.Graph;
+
 import map.GraphNode;
 import map.Path;
+
 import utils.Utils;
 
 import java.util.ArrayList;
 
-public class Vehicle extends Elementary{
+public class Vehicle extends Elementary {
     private final GraphNode startPos;
     private final String type;
     private final String name;
     private Path currentPath;
-    private final double tankSize;
-    private final double maxCapacity;
-    private double currentLoad;
-    private double profit;
+    private final float tankSize;
+    private final float maxCapacity;
+    private float currentLoad;
+    private float profit;
     private ArrayList<Request> requests;
 
-    public String getVehicleName() {
-        return name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public Vehicle(String n, String t, GraphNode sp, double ts, double mc) {
+    public Vehicle(String n, String t, GraphNode sp, float ts, float mc) {
         name = n;
         type = t;
         startPos = sp;
@@ -37,8 +30,21 @@ public class Vehicle extends Elementary{
         currentLoad = 0;
         currentPath = null;
         requests = new ArrayList<Request>();
-        if (!super.registerInYellowPages(type, name))
+    }
+
+    public void setup() {
+        log("hello my name is " + getAID().getLocalName());
+
+        if (!registerInYellowPages(type, name))
             Utils.print(name,"Failed to register to yellow pages services");
+    }
+
+    public String getVehicleName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public GraphNode getStartPos() {
@@ -65,7 +71,7 @@ public class Vehicle extends Elementary{
         return currentLoad;
     }
 
-    public void setCurrentLoad(double currentLoad) {
+    public void setCurrentLoad(float currentLoad) {
         this.currentLoad = currentLoad;
     }
 
@@ -73,7 +79,7 @@ public class Vehicle extends Elementary{
         return profit;
     }
 
-    public void setProfit(double profit) {
+    public void setProfit(float profit) {
         this.profit = profit;
     }
 

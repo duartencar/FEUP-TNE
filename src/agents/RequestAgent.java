@@ -1,15 +1,17 @@
 package agents;
 
 import logic.Request;
+
 import map.Graph;
 import map.GraphNode;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static utils.Constants.AgentsProperties.RequestAgent.*;
@@ -51,6 +53,10 @@ public class RequestAgent extends Elementary {
             default:
                 throw new Exception("Invalid agent mode.");
         }
+    }
+
+    public void setup() {
+        log("hello my name is " + getAID().getLocalName());
     }
 
     private boolean parseRequests(Document requestsDoc) {
@@ -109,9 +115,5 @@ public class RequestAgent extends Elementary {
             Request newRequest = generateRequest(i,1 + generateInt(8), g.getRandomLocation(), "1200");
             requests.put(newRequest.getId(), newRequest);
         }
-    }
-
-    public void setup() {
-        log("hello");
     }
 }
