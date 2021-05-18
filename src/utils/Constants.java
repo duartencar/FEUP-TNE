@@ -26,4 +26,19 @@ public final class Constants {
 
         }
     }
+    
+    public final class GuiProperties {
+    	
+    	public final class Layout {
+    		public static final int HEIGHT = 769;
+        	public static final int WIDTH = 1366;
+        	
+        	public static final int BORDER = 10;
+    	}
+    	
+    	public final class Text {
+    		public static final String WINDOW_TITLE = "Distributed Logistics - DashBoard";
+    	}
+    	
+    }
 }
