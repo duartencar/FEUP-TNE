@@ -1,12 +1,13 @@
 package gui;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 
+import agents.Vehicle;
 import gui.layout.AgentsPanel;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.util.ArrayList;
 
 public class DistributedLogistics {
 	
@@ -17,9 +18,19 @@ public class DistributedLogistics {
 	
 	JFrame mainFrame;
 	AgentsPanel agentsScrollableDisplay;
+	JScrollPane scrol;
 	Canvas mapDisplay;
+
+	final ArrayList<Vehicle> agents;
 	
-	public DistributedLogistics() {
+	public DistributedLogistics(ArrayList<Vehicle> agents) throws Exception {
+
+		if(agents.size() == 0) {
+			throw new Exception("No agents.");
+		}
+
+		this.agents = agents;
+
 		createMainFrame();
 		createScrollableDisplay();
 		createCanvas();
@@ -27,15 +38,21 @@ public class DistributedLogistics {
 	
     public void createMainFrame() {
     	mainFrame = new JFrame(WINDOW_TITLE);
+    	mainFrame.getContentPane().setBackground(Color.LIGHT_GRAY);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(WIDTH,HEIGHT);
         mainFrame.getContentPane().setLayout(null);
     }
     
     public void createScrollableDisplay() {
-    	agentsScrollableDisplay = new AgentsPanel();
-        agentsScrollableDisplay.setBounds(BORDER, BORDER, (WIDTH - 2 * BORDER) / 5, HEIGHT - 6 * BORDER);
-        mainFrame.getContentPane().add(agentsScrollableDisplay);
+    	agentsScrollableDisplay = new AgentsPanel(agents);
+		agentsScrollableDisplay.setPanelFather(this);
+
+		scrol = new JScrollPane(agentsScrollableDisplay, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrol.setBounds(BORDER, BORDER, (WIDTH - 2 * BORDER) / 5, HEIGHT - 6 * BORDER);
+		scrol.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255)));
+
+		mainFrame.getContentPane().add(scrol);
     }
     
     public void createCanvas() {

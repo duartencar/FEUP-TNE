@@ -7,6 +7,7 @@ import map.Path;
 
 import utils.Utils;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Vehicle extends Elementary {
@@ -138,5 +139,12 @@ public class Vehicle extends Elementary {
         consumption *= Math.exp(speed/100);
 
         return consumption;
+    }
+
+    public void paint(Graphics g, int x, int y, int width, int height) {
+        g.setColor(new Color(255, 255, 255));
+        g.fillRect(x, y, width, height);
+        g.setColor(new Color(0, 0, 0));
+        g.drawString("Nome: " + name, x + 10, y + 30);
     }
 }

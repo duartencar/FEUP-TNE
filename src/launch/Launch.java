@@ -217,10 +217,16 @@ public class Launch extends Boot {
             System.exit(0);
         }
 
-        DistributedLogistics d = new DistributedLogistics();
-        log("gui");
+        try {
+            DistributedLogistics d = new DistributedLogistics(vehicleAgents);
+        } catch (Exception e) {
+            log("GUI exception: " + e.getMessage());
+            System.exit(0);
+        }
 
         startAgents();
+
+        log("gui");
 
         return;
     }
