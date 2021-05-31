@@ -1,5 +1,7 @@
 package utils;
 
+import java.awt.*;
+
 public final class Constants {
 
     public final class Arguments {
@@ -39,6 +41,6 @@ public final class Constants {
     	public final class Text {
     		public static final String WINDOW_TITLE = "Distributed Logistics - DashBoard";
     	}
-    	
+
     }
 }

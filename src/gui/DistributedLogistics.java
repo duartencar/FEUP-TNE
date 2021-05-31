@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import agents.Vehicle;
 import gui.layout.AgentsPanel;
+import gui.layout.MapDisplay;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -19,7 +20,7 @@ public class DistributedLogistics {
 	JFrame mainFrame;
 	AgentsPanel agentsScrollableDisplay;
 	JScrollPane scrol;
-	Canvas mapDisplay;
+	MapDisplay mapDisplay;
 
 	final ArrayList<Vehicle> agents;
 	
@@ -56,7 +57,7 @@ public class DistributedLogistics {
     }
     
     public void createCanvas() {
-    	mapDisplay = new Canvas();
+    	mapDisplay = new MapDisplay();
     	mapDisplay.setBackground(Color.BLACK);
     	mapDisplay.setBounds(BORDER * 2 + WIDTH / 5, BORDER, WIDTH - (BORDER * 4 + WIDTH / 5), HEIGHT - 6 * BORDER);
         mainFrame.getContentPane().add(mapDisplay);
