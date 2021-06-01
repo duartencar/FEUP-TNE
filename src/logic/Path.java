@@ -1,4 +1,8 @@
-package map;
+package logic;
+
+import map.Graph;
+import map.GraphEdge;
+import map.GraphNode;
 
 import java.util.ArrayList;
 
