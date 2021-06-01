@@ -13,8 +13,8 @@ import java.util.ArrayList;
 public class DistributedLogistics {
 	
 	public static final String WINDOW_TITLE = "Distributed Logistics - DashBoard";
-	public static final int HEIGHT = 769;
-	public static final int WIDTH = 1366;
+	public static final int HEIGHT = 1000;
+	public static final int WIDTH = 1920;
 	public static final int BORDER = 10;
 	
 	JFrame mainFrame;

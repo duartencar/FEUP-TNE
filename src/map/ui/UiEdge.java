@@ -30,4 +30,8 @@ public class UiEdge {
         g.setColor(color);
         g.drawLine(startX, startY, endX, endY);
     }
+
+    public int getDestinationId() {
+        return destinationId;
+    }
 }

@@ -33,12 +33,24 @@ public class UiNode extends GraphElement {
         edges.add(e);
     }
 
+    public boolean hasEdgeTo(int id) {
+        for(UiEdge edge : edges) {
+            if(id == edge.getDestinationId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void paint(Graphics g) {
-        g.setColor(color);
-        g.drawOval(x-RADIUS, y-RADIUS, RADIUS, RADIUS);
 
         for(UiEdge edge : edges) {
             edge.paint(g);
         }
+
+        g.setColor(color);
+
+        g.fillOval(x-RADIUS/2, y-RADIUS/2, RADIUS, RADIUS);
     }
 }
