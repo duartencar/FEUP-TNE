@@ -9,23 +9,27 @@ import static utils.Utils.log;
 
 public class AlphaSchedule {
     // must be threadSafe
-    Vector<ScheduleComponent> tasks;
+    Vector<Task> tasks;
 
     public AlphaSchedule() {
-        tasks = new Vector<ScheduleComponent>();
+        tasks = new Vector<Task>();
     }
 
     public short getTotalScheduleCost() {
         short sum = 0;
 
-        for(ScheduleComponent t : tasks) {
+        for(Task t : tasks) {
             sum += t.getCost();
         }
 
         return sum;
     }
 
-    public void addTask(ScheduleComponent task) {
+    public int numberOfTasks() {
+        return tasks.size();
+    }
+
+    public void addTask(Task task) {
         GraphNode start = task.getStart(), end = task.getEnd();
 
         if(tasks.isEmpty()) {
@@ -40,14 +44,15 @@ public class AlphaSchedule {
             tasks.add(task);
         }
         else {
-            for(int i = 1; i < tasks.size() - 1; i++) {
-                if(tasks.get(i).getStart().getId() == start.getId()) {
+            for(int i = 1; i < tasks.size(); i++) {
+                Task t = tasks.get(i);
+                if(t.getStart().getId() == start.getId()) {
                     // replace with new task
                     tasks.add(i, task);
 
                     try {
-                        Path newPathForNextTask = new Path (Graph.getInstance().getGraphToSearch().findPath(task.getEnd().getId(), tasks.get(i+1).getStart().getId()));
-                        tasks.get(i+1).setNewPath(newPathForNextTask);
+                        Path newPathForNextTask = new Path (Graph.getInstance().getGraphToSearch().findPath(task.getEnd().getId(), t.getEnd().getId()));
+                        t.setNewPath(newPathForNextTask);
                     } catch (Exception e) {
                         log(e.getMessage());
                     }
