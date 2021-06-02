@@ -185,5 +185,7 @@ public class Vehicle extends Elementary {
         g.setColor(new Color(0, 0, 0));
         g.drawString("Nome: " + name, x + 10, y + 30);
         g.drawString(schedule.toString(), x + 10, y + 50);
+        g.setColor(agentColor);
+        g.fillRect(width - 20, y, 20, 20);
     }
 }
