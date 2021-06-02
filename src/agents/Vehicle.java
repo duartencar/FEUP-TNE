@@ -1,5 +1,8 @@
 package agents;
 
+import agents.behaviours.GenerateRandomTasks;
+import gui.DistributedLogistics;
+import logic.AlphaSchedule;
 import logic.Request;
 
 import map.GraphNode;
@@ -9,6 +12,9 @@ import utils.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
+
+import static utils.Utils.generateFloat;
+import static utils.Utils.generateInt;
 
 public class Vehicle extends Elementary {
     private final GraphNode startPos;
@@ -21,6 +27,14 @@ public class Vehicle extends Elementary {
     private float profit;
     private ArrayList<Request> requests;
 
+
+
+
+    private AlphaSchedule schedule;
+    private DistributedLogistics gui;
+    public int numberOfRequests = 0;
+    public Color agentColor;
+
     public Vehicle(String n, String t, GraphNode sp, float ts, float mc) {
         name = n;
         type = t;
@@ -31,6 +45,28 @@ public class Vehicle extends Elementary {
         currentLoad = 0;
         currentPath = null;
         requests = new ArrayList<Request>();
+        schedule = new AlphaSchedule();
+        agentColor = new Color(generateFloat(), generateFloat(), generateFloat());
+    }
+
+    public DistributedLogistics getGui() {
+        return gui;
+    }
+
+    public void setColor(Color c) {
+        this.agentColor = c;
+    }
+
+    public Color getColor() {
+        return agentColor;
+    }
+
+    public AlphaSchedule getSchedule() {
+        return schedule;
+    }
+
+    public void setGui(DistributedLogistics gui) {
+        this.gui = gui;
     }
 
     public void setup() {
@@ -38,6 +74,8 @@ public class Vehicle extends Elementary {
 
         if (!registerInYellowPages(type, name))
             Utils.print(name,"Failed to register to yellow pages services");
+
+        addBehaviour(new GenerateRandomTasks(this, 500 + generateInt(500)));
     }
 
     public String getVehicleName() {
@@ -146,5 +184,6 @@ public class Vehicle extends Elementary {
         g.fillRect(x, y, width, height);
         g.setColor(new Color(0, 0, 0));
         g.drawString("Nome: " + name, x + 10, y + 30);
+        g.drawString(schedule.toString(), x + 10, y + 50);
     }
 }

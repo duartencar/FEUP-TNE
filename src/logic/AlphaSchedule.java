@@ -3,6 +3,7 @@ package logic;
 import map.Graph;
 import map.GraphNode;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import static utils.Utils.log;
@@ -29,7 +30,23 @@ public class AlphaSchedule {
         return tasks.size();
     }
 
-    public void addTask(Task task) {
+    public int getLastTaskDestination() {
+        return tasks.size() == 0 ? -1 : tasks.get(tasks.size() - 1).getEnd().getId();
+    }
+
+    public ArrayList<Integer> getFullPath() {
+        ArrayList<Integer> fullPath = new ArrayList<Integer>(tasks.size() * 2);
+
+        for(Task t : tasks) {
+            for(GraphNode g : t.getPathToTarget().getNodes()) {
+                fullPath.add(g.getId());
+            }
+        }
+
+        return fullPath;
+    }
+
+    public synchronized void addTask(Task task) {
         GraphNode start = task.getStart(), end = task.getEnd();
 
         if(tasks.isEmpty()) {

@@ -21,6 +21,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -93,6 +94,7 @@ public class Launch extends Boot {
 
 
         int numberOfAgents = 0;
+        int r, g, b;
 
         for(int i = 0; i < agentsList.getLength(); i++) {
             Node agent = agentsList.item(i);
@@ -106,6 +108,22 @@ public class Launch extends Boot {
                 String capacity = element.getAttribute("capacity");
                 String pathFindingAlgorithm = element.getAttribute("pathFinding");
                 String startNode = element.getAttribute("startNode");
+                String agentColor = element.getAttribute("color");
+                String[] rgbValues = agentColor.split(" ");
+
+                if(rgbValues.length != 3) {
+                    log("Element in line " + i + " has invalid color " + element.getBaseURI().toString());
+                    continue;
+                }
+
+                r = convertToInteger(rgbValues[0]);
+                g = convertToInteger(rgbValues[1]);
+                b = convertToInteger(rgbValues[2]);
+
+                if(r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+                    log("Element in line " + i + " has color values out of range " + element.getBaseURI().toString());
+                    continue;
+                }
 
                 if(name.equals("") || vehicleType.equals("") || tank.equals("") || capacity.equals("") || pathFindingAlgorithm.equals("")) {
                     log("Element in line " + i + " is invalid " + element.getBaseURI().toString());
@@ -121,6 +139,7 @@ public class Launch extends Boot {
 
                 try {
                     Vehicle vehicle = new Vehicle(name, vehicleType, startPos, convertToFloat(tank), convertToFloat(capacity));
+                    vehicle.setColor(new Color(r, g, b));
                     vehicleAgents.add(vehicle);
                     agentsController.add(simulationContainerController.acceptNewAgent(name, vehicle));
                     numberOfAgents++;
@@ -201,6 +220,12 @@ public class Launch extends Boot {
         }
     }
 
+    private static void addGuiReferenceToAgents(DistributedLogistics g) {
+        for(Vehicle v: vehicleAgents) {
+            v.setGui(g);
+        }
+    }
+
     public static void main(String[] args) {
         
         checkParameters(args);
@@ -219,6 +244,7 @@ public class Launch extends Boot {
 
         try {
             DistributedLogistics d = new DistributedLogistics(vehicleAgents);
+            addGuiReferenceToAgents(d);
         } catch (Exception e) {
             log("GUI exception: " + e.getMessage());
             System.exit(0);

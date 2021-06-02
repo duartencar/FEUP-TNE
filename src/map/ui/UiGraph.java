@@ -44,9 +44,15 @@ public class UiGraph {
         }
     }
 
-    public void paint(Graphics g) {
-        for (UiNode value : nodes.values()) {
+    public void reset() {
+        for (UiNode n : nodes.values()) {
+            n.reset();
+        }
+    }
 
+    public void paint(Graphics g) {
+
+        for (UiNode value : nodes.values()) {
             value.paint(g);
         }
     }

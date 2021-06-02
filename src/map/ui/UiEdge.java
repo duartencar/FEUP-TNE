@@ -31,6 +31,10 @@ public class UiEdge {
         g.drawLine(startX, startY, endX, endY);
     }
 
+    public void reset() {
+        color = Color.BLACK;
+    }
+
     public int getDestinationId() {
         return destinationId;
     }

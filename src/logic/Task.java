@@ -20,6 +20,10 @@ public class Task {
         deliveryTime = time;
     }
 
+    public Path getPathToTarget() {
+        return pathToTarget;
+    }
+
     public int getRequestId() {
         return requestId;
     }
