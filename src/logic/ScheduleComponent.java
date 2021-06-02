@@ -28,6 +28,14 @@ public class ScheduleComponent {
         return pathToTarget.getNodes().get(0);
     }
 
+    public void setNewPath(Path p) {
+        pathToTarget = p;
+    }
+
+    public short getCost() {
+        return pathToTarget.getWeight();
+    }
+
     public GraphNode getEnd() {
         return pathToTarget.getNodes().get(pathToTarget.getNodes().size() - 1);
     }
