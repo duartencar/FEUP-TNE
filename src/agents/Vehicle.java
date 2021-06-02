@@ -3,7 +3,7 @@ package agents;
 import logic.Request;
 
 import map.GraphNode;
-import map.Path;
+import logic.Path;
 
 import utils.Utils;
 
