@@ -7,9 +7,9 @@ public class Request {
     private String parentId;
     private int numBoxes;
     private GraphNode destination;
-    private String deliveryTime;
+    private int deliveryTime;
 
-    public Request(String id, String parentId, int numBoxes, GraphNode destination, String deliveryTime) {
+    public Request(String id, String parentId, int numBoxes, GraphNode destination, int deliveryTime) {
         this.id = id;
         this.parentId = parentId;
         this.numBoxes = numBoxes;
@@ -49,11 +49,11 @@ public class Request {
         this.destination = destination;
     }
 
-    public String getDeliveryTime() {
+    public int getDeliveryTime() {
         return deliveryTime;
     }
 
-    public void setDeliveryTime(String deliveryTime) {
+    public void setDeliveryTime(int deliveryTime) {
         this.deliveryTime = deliveryTime;
     }
 }

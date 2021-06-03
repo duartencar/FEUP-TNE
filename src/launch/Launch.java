@@ -88,7 +88,7 @@ public class Launch extends Boot {
                 String startNode = element.getAttribute("startNode");
 
                 if(name.equals("") || vehicleType.equals("") || tank.equals("") || capacity.equals("") || pathFindingAlgorithm.equals("")) {
-                    log("Element in line " + i + " is invalid " + element.getBaseURI().toString());
+                    log("Element in line " + i + " is invalid " + element.getBaseURI());
                     continue;
                 }
 
@@ -165,11 +165,9 @@ public class Launch extends Boot {
 
         createSimulationContainer(args[ARGUMENT_GUI_INDEX].equals("-" + Profile.GUI));
 
-        if(loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
+        if(!loadAndStartAgents(args[ARGUMENT_AGENTS_INDEX])) {
             log("Problem with agents file");
             System.exit(0);
         }
-
-        return;
     }
 }

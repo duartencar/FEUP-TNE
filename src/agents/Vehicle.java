@@ -1,15 +1,20 @@
 package agents;
 
+import behaviours.VehicleReceiveBehaviour;
 import logic.Request;
 import map.Graph;
 import map.GraphNode;
 import map.Path;
+import map.search.DijkstraGraph;
+import map.search.DijkstraNode;
 import utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Vehicle extends Elementary{
     private final GraphNode startPos;
+    private GraphNode currentPos;
     private final String type;
     private final String name;
     private Path currentPath;
@@ -31,14 +36,16 @@ public class Vehicle extends Elementary{
         name = n;
         type = t;
         startPos = sp;
+        currentPos = sp;
         tankSize = ts;
         maxCapacity = mc;
         profit = 0;
         currentLoad = 0;
         currentPath = null;
-        requests = new ArrayList<Request>();
-        if (!super.registerInYellowPages(type, name))
+        requests = new ArrayList<>();
+        if (!super.registerInYellowPages("truck", name))
             Utils.print(name,"Failed to register to yellow pages services");
+        addBehaviour(new VehicleReceiveBehaviour(this));
     }
 
     public GraphNode getStartPos() {
@@ -86,18 +93,9 @@ public class Vehicle extends Elementary{
             //TODO: check if new request exceeds gas tank by checking consumption (requires the pathfinding algorithm)
             return false;
         }
-        String[] date1 = newRequest.getDeliveryTime().split("/");
-        int day = Integer.parseInt(date1[0]);
-        int month = Integer.parseInt(date1[1]);
-        int year = Integer.parseInt(date1[2]);
         int i = 0;
         for (Request r : requests) {
-            date1 = r.getDeliveryTime().split("/");
-            int d = Integer.parseInt(date1[0]);
-            int m = Integer.parseInt(date1[1]);
-            int y = Integer.parseInt(date1[2]);
-
-            if (year < y || year == y && month < m || year == y && month == m && day < d)
+            if (newRequest.getDeliveryTime() < r.getDeliveryTime())
                 break;
             i++;
         }
@@ -129,8 +127,88 @@ public class Vehicle extends Elementary{
          */
         double consumption = 15 + currentLoad/9;
         //consumption *= Math.pow(speed/50,2);
-        consumption *= Math.exp(speed/100);
+        consumption *= Math.exp((float)speed/100.0);
 
         return consumption;
+    }
+
+    public boolean canHandleRequest(int numBoxes) {
+        //TODO: check if enough gas
+        return (currentLoad+numBoxes <= maxCapacity);
+    }
+
+    public String handleCallForProposal(int numBoxes, int time, String destinationNode, String pathChoosing) {
+        //TODO: use a pathfinding algorithm to see how long it would take for it to distribute the request
+        /*
+        distance traveled: 25
+        loadIfAccepts: 85%
+	    costIfAccepts: 8€
+         */
+        String ret = "";
+        int load = (int) ((currentLoad+numBoxes)*100/maxCapacity);
+        DijkstraGraph map = Graph.getInstance().getGraphToSearch();
+        ArrayList<Request> auxRequests = new ArrayList<>();
+        ArrayList<GraphNode> path = new ArrayList<>();
+        GraphNode before = null, after = null;
+        if (pathChoosing.contains("time")) {
+            for (Request req : requests) {
+                if (req.getDeliveryTime() < time) {
+                    auxRequests.add(req);
+                    path.add(req.getDestination());
+                    before = req.getDestination();
+                } else {
+                    after = req.getDestination();
+                    break;
+                }
+            }
+        } else if (pathChoosing.contains("path")) {
+            int min = 99999999;
+            int pos = requests.size();
+            for (Request req: requests) {
+                //TODO: append here
+                before = req.getDestination();
+                after = req.getDestination();
+            }
+        }
+
+        //TODO: calculate detour cost
+        int prev = -1, curr = -1, next = -1;
+        for (Map.Entry node: Graph.getInstance().nodes.entrySet()) {
+            if (node.getValue().equals(destinationNode)) {
+                curr = (int)node.getKey();
+                break;
+            }
+        }
+        if (before != null) {
+            for (Map.Entry node: Graph.getInstance().nodes.entrySet()) {
+                if (node.getValue().equals(before)) {
+                    prev = (int)node.getKey();
+                    break;
+                }
+            }
+        }
+        if (after != null) {
+            for (Map.Entry node: Graph.getInstance().nodes.entrySet()) {
+                if (node.getValue().equals(after)) {
+                    next = (int)node.getKey();
+                    break;
+                }
+            }
+        }
+        int cost = 0;
+        if (prev != -1) {
+            ArrayList<Integer> p = map.findPath(prev, curr);
+            cost += p.size(); //TODO: use road weights, and not length of path
+        }
+        if (next != -1) {
+            ArrayList<Integer> p = map.findPath(curr, next);
+            cost += p.size();
+        }
+
+        return ret+cost;
+    }
+
+    protected void setup() {
+        addBehaviour(new VehicleReceiveBehaviour(this));
     }
 }
