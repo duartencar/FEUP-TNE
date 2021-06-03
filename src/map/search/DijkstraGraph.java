@@ -36,6 +36,16 @@ public class DijkstraGraph {
         return nodes.size();
     }
 
+    public void reset() {
+        for(Integer id : nodes.keySet()) {
+            nodes.get(id).reset();
+        }
+
+        queue.clear();
+
+        queue.ensureCapacity(nodes.size() / 2);
+    }
+
     private void addToQueue(DijkstraNode toAdd) {
         for(int i = 0; i < queue.size(); i++) {
             if(toAdd.distance < queue.get(i).distance) {
@@ -52,9 +62,9 @@ public class DijkstraGraph {
     }
 
     public ArrayList<Integer> findPath(Integer start, Integer end) {
+        reset();
+
         ArrayList<Integer> answer = new ArrayList<Integer>(2);
-
-
         DijkstraNode begin = nodes.get(start);
         DijkstraNode last = nodes.get(end);
         DijkstraNode aux = null;

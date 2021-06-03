@@ -4,12 +4,12 @@ import map.GraphNode;
 
 import java.util.Date;
 
-public class ScheduleComponent {
+public class Task {
     private Path pathToTarget;
     private int requestId;
     private Date deliveryTime;
 
-    public ScheduleComponent(Path path, int id, Date time) throws Exception {
+    public Task(Path path, int id, Date time) throws Exception {
 
         if(path.getNumberOfSteps() < 2) {
             throw new Exception("Path has to have at least two nodes.");
@@ -18,6 +18,10 @@ public class ScheduleComponent {
         pathToTarget = path;
         requestId = id;
         deliveryTime = time;
+    }
+
+    public Path getPathToTarget() {
+        return pathToTarget;
     }
 
     public int getRequestId() {
@@ -44,7 +48,11 @@ public class ScheduleComponent {
         return deliveryTime;
     }
 
-    public int compareTo(ScheduleComponent sc) {
+    public int compareTo(Task sc) {
         return deliveryTime.compareTo(sc.getDeliveryTime());
+    }
+
+    public String toString() {
+        return getStart().getId() + " -> " + getEnd().getId();
     }
 }

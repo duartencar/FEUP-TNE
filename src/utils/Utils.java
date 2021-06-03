@@ -37,6 +37,10 @@ public class Utils {
         return new Random().nextInt(upper);
     }
 
+    public static float generateFloat() {
+        return new Random().nextFloat();
+    }
+
     public static Scanner getFileReference(final String filePath) {
 
         File f;

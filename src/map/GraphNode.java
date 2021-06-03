@@ -39,6 +39,14 @@ public class GraphNode extends GraphElement {
         return true;
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
     public ArrayList<GraphEdge> getEdges() {
         return edges;
     }

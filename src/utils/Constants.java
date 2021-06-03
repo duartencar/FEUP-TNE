@@ -1,5 +1,7 @@
 package utils;
 
+import java.awt.*;
+
 public final class Constants {
 
     public final class Arguments {
@@ -26,5 +28,20 @@ public final class Constants {
             public static final String SERVICE_NAME = "request-delivery";
             public static final String SERVICE_TYPE = "transport";
         }
+    }
+    
+    public final class GuiProperties {
+    	
+    	public final class Layout {
+    		public static final int HEIGHT = 769;
+        	public static final int WIDTH = 1366;
+        	
+        	public static final int BORDER = 10;
+    	}
+    	
+    	public final class Text {
+    		public static final String WINDOW_TITLE = "Distributed Logistics - DashBoard";
+    	}
+
     }
 }

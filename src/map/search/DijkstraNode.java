@@ -20,6 +20,14 @@ public class DijkstraNode extends GraphElement {
         distance = Short.MAX_VALUE;
     }
 
+    public void reset() {
+        previous = null;
+
+        distance = Short.MAX_VALUE;
+
+        visited = false;
+    }
+
     public void addEdge(DijkstraEdge newEdge) {
         edges.add(newEdge);
     }

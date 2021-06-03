@@ -4,6 +4,8 @@ import behaviours.VehicleReceiveBehaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import agents.behaviours.GenerateRandomTasks;
+import gui.DistributedLogistics;
 import logic.AlphaSchedule;
 import logic.Request;
 
@@ -16,11 +18,15 @@ import logic.Path;
 
 import utils.Utils;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
 
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_NAME;
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_TYPE;
+
+import static utils.Utils.generateFloat;
+import static utils.Utils.generateInt;
 
 public class Vehicle extends Elementary {
     private final GraphNode startPos;
@@ -36,6 +42,13 @@ public class Vehicle extends Elementary {
     private AlphaSchedule vehicleSchedule;
     private DijkstraGraph searchGraph;
 
+
+
+    private AlphaSchedule schedule;
+    private DistributedLogistics gui;
+    public int numberOfRequests = 0;
+    public Color agentColor;
+
     public Vehicle(String n, String t, GraphNode sp, float ts, float mc) {
         name = n;
         type = t;
@@ -47,8 +60,28 @@ public class Vehicle extends Elementary {
         currentLoad = 0;
         currentPath = null;
         requests = new ArrayList<Request>();
-        vehicleSchedule = new AlphaSchedule();
-        searchGraph = Graph.getInstance().getGraphToSearch();
+        schedule = new AlphaSchedule();
+        agentColor = new Color(generateFloat(), generateFloat(), generateFloat());
+    }
+
+    public DistributedLogistics getGui() {
+        return gui;
+    }
+
+    public void setColor(Color c) {
+        this.agentColor = c;
+    }
+
+    public Color getColor() {
+        return agentColor;
+    }
+
+    public AlphaSchedule getSchedule() {
+        return schedule;
+    }
+
+    public void setGui(DistributedLogistics gui) {
+        this.gui = gui;
     }
 
     public void setup() {
@@ -230,5 +263,13 @@ public class Vehicle extends Elementary {
         }
 
         return ret+cost;
+    public void paint(Graphics g, int x, int y, int width, int height) {
+        g.setColor(new Color(255, 255, 255));
+        g.fillRect(x, y, width, height);
+        g.setColor(new Color(0, 0, 0));
+        g.drawString("Nome: " + name, x + 10, y + 30);
+        g.drawString(schedule.toString(), x + 10, y + 50);
+        g.setColor(agentColor);
+        g.fillRect(width - 20, y, 20, 20);
     }
 }

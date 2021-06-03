@@ -1,6 +1,7 @@
 package map;
 
 import map.search.DijkstraGraph;
+import map.ui.UiGraph;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -136,6 +137,14 @@ public class Graph {
     public DijkstraGraph getGraphToSearch() {
         if(valid) {
             return new DijkstraGraph(nodes);
+        }
+
+        return null;
+    }
+
+    public UiGraph getGraphToDisplay() {
+        if(valid) {
+            return new UiGraph(nodes, headQuarter, gasStations);
         }
 
         return null;
