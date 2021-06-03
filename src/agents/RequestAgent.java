@@ -1,11 +1,8 @@
 package agents;
 
+import behaviours.MakeContractRequests;
 import behaviours.RequestBehaviour;
 import jade.core.AID;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
 import logic.Request;
 
 import map.Graph;
@@ -22,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static utils.Constants.AgentsProperties.RequestAgent.*;
+import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_TYPE;
 import static utils.Constants.Directories.SIMULATIONS_DATA_PATH;
 import static utils.Utils.*;
 import static utils.Utils.convertToInteger;
@@ -32,6 +30,7 @@ public class RequestAgent extends Elementary {
     final private int mode;
     final private HashMap<Integer, Request> requests;
     final private ArrayList<Request> requests_old;
+    public int currentRequest = 0;
 
     public RequestAgent(int id, String name, String randomRequests, String fileOrNumberOfRequests) throws Exception {
         this.id=id;
@@ -68,26 +67,20 @@ public class RequestAgent extends Elementary {
         return requests_old;
     }
 
+    public HashMap<Integer, Request> getRequestsToPerform() {
+        return requests;
+    }
+
     public ArrayList<AID> getVehicles() {
         ArrayList<AID> vehicles = new ArrayList<>();
-        DFAgentDescription template = new DFAgentDescription();
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("truck");
-        template.addServices(sd);
 
-        try {
-            DFAgentDescription[] results = DFService.search(this, template);
-            for (DFAgentDescription result : results) {
-                vehicles.add(result.getName());
-            }
-        } catch (FIPAException e) {
-            e.printStackTrace();
-        }
+        updateAgents(vehicles, SERVICE_TYPE);
+
         return vehicles;
     }
 
     protected void setup() {
-        addBehaviour(new RequestBehaviour(this));
+        addBehaviour(new MakeContractRequests(this, 500));
     }
 
     private boolean parseRequests(Document requestsDoc) {

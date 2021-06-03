@@ -1,6 +1,9 @@
 package agents;
 
 import behaviours.VehicleReceiveBehaviour;
+import jade.domain.FIPANames;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import logic.Request;
 
 import map.Graph;
@@ -14,6 +17,9 @@ import utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_NAME;
+import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_TYPE;
 
 public class Vehicle extends Elementary {
     private final GraphNode startPos;
@@ -43,10 +49,14 @@ public class Vehicle extends Elementary {
     public void setup() {
         log("hello my name is " + getAID().getLocalName());
 
-        if (!registerInYellowPages(type, name))
+        if (!registerInYellowPages(SERVICE_TYPE, SERVICE_NAME))
             Utils.print(name,"Failed to register to yellow pages services");
+
+        MessageTemplate template = MessageTemplate.and(
+                MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
+                MessageTemplate.MatchPerformative(ACLMessage.CFP) );
             
-        addBehaviour(new VehicleReceiveBehaviour(this));
+        addBehaviour(new VehicleReceiveBehaviour(this, template));
     }
 
     public String getVehicleName() {

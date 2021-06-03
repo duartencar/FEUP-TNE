@@ -13,9 +13,11 @@ import java.util.Date;
 
 public abstract class Elementary extends Agent {
     protected ArrayList<AID> logisticsAgents;
+
     protected boolean registerServices(ArrayList<ServiceDescription> serviceDescriptions){
         DFAgentDescription agentDescription = new DFAgentDescription();
         agentDescription.setName(getAID());
+
         for(ServiceDescription serviceDescription : serviceDescriptions){
             agentDescription.addServices(serviceDescription);
         }

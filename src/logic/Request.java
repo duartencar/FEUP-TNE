@@ -17,6 +17,10 @@ public class Request {
         this.deliveryTime = deliveryTime;
     }
 
+    public String toString() {
+        return numBoxes + "-" + deliveryTime + "-" + destination.getId() + "-time-" + id;
+    }
+
     public int getId() {
         return id;
     }

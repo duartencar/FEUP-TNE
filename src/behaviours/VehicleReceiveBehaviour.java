@@ -4,6 +4,7 @@ import agents.Vehicle;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
@@ -17,14 +18,19 @@ import static utils.Utils.convertToInteger;
 
 public class VehicleReceiveBehaviour extends ContractNetResponder {
     private final Vehicle parent;
-    public VehicleReceiveBehaviour(Vehicle a) {
-        super(a, MessageTemplate.MatchPerformative(ACLMessage.CFP));
+
+    public VehicleReceiveBehaviour(Vehicle a, MessageTemplate template) {
+        super(a, template);
         parent = a;
     }
 
+    @Override
     protected ACLMessage handleCfp(ACLMessage cfp) {
         ACLMessage reply = cfp.createReply();
         String[] content = cfp.getContent().split("-");
+
+        System.out.println("Agent "+parent.getLocalName()+": CFP received from "+cfp.getSender().getName()+". Action is "+cfp.getContent());
+
         if (parent.canHandleRequest(Integer.parseInt(content[0]))) {
             reply.setPerformative(ACLMessage.PROPOSE);
             reply.setContent(parent.handleCallForProposal(Integer.parseInt(content[0]), Integer.parseInt(content[1]), content[2], content[3])+"-"+content[4]);
@@ -33,7 +39,7 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
         }
         return reply;
     }
-    
+
     protected void handleRejectProposal(ACLMessage cfp) {}
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp) {

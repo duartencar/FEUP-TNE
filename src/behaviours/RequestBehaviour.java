@@ -11,6 +11,8 @@ import logic.Request;
 
 import java.util.*;
 
+import static utils.Utils.log;
+
 public class RequestBehaviour extends ContractNetInitiator {
     private AID bestCompany;
     private int bestCost;
@@ -33,8 +35,8 @@ public class RequestBehaviour extends ContractNetInitiator {
         }
     }
 
-    public RequestBehaviour(RequestAgent p) {
-        super(p, new ACLMessage(ACLMessage.CFP));
+    public RequestBehaviour(RequestAgent p, ACLMessage msg) {
+        super(p, msg);
         this.parent = p;
         proposals = new HashMap<>();
     }
@@ -42,27 +44,7 @@ public class RequestBehaviour extends ContractNetInitiator {
     private int numBoxes;
     private GraphNode destination;
     private int deliveryTime;
- */
-    @Override
-    protected Vector prepareCfps(ACLMessage cfp) {
-        Vector<ACLMessage> cfps = new Vector<>();
-        ArrayList<Request> requests = this.parent.getRequests();
-        ArrayList<AID> logistics = this.parent.getVehicles();
-
-        for (AID vehicle : logistics) {
-            cfp.addReceiver(vehicle);
-        }
-
-        for (Request request : requests) {
-            Proposal proposal = new Proposal(request);
-            proposals.put(request.getId() + "", proposal);
-            String createMessage = "";
-            createMessage += request.getNumBoxes()+"-"+request.getDeliveryTime()+"-"+request.getDestination().getId()+"-time-"+request.getId();
-            cfp.setContent(createMessage);
-            cfps.add(cfp);
-        }
-        return cfps;
-    }
+*/
 
     @Override
     protected void handleAllResponses(Vector responses, Vector acceptances) {

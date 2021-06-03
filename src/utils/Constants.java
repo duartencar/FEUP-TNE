@@ -23,7 +23,8 @@ public final class Constants {
         }
 
         public final class VehicleAgent {
-
+            public static final String SERVICE_NAME = "request-delivery";
+            public static final String SERVICE_TYPE = "transport";
         }
     }
 }
