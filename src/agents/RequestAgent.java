@@ -80,7 +80,12 @@ public class RequestAgent extends Elementary {
     }
 
     protected void setup() {
-        addBehaviour(new MakeContractRequests(this, 500));
+        if(requests.size() > 0) {
+            addBehaviour(new MakeContractRequests(this, 500));
+        }
+        else {
+            log("Didn't have requests.");
+        }
     }
 
     private boolean parseRequests(Document requestsDoc) {

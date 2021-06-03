@@ -1,13 +1,11 @@
 package behaviours;
 
 import agents.Vehicle;
-import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetResponder;
+import logic.Cfp;
 import logic.Request;
 import map.Graph;
 import map.GraphNode;
@@ -18,6 +16,7 @@ import static utils.Utils.convertToInteger;
 
 public class VehicleReceiveBehaviour extends ContractNetResponder {
     private final Vehicle parent;
+    private Cfp requestToAnswer = null;
 
     public VehicleReceiveBehaviour(Vehicle a, MessageTemplate template) {
         super(a, template);
@@ -26,18 +25,41 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
 
     @Override
     protected ACLMessage handleCfp(ACLMessage cfp) {
-        ACLMessage reply = cfp.createReply();
-        String[] content = cfp.getContent().split("-");
+        ACLMessage reply = null;
 
-        System.out.println("Agent "+parent.getLocalName()+": CFP received from "+cfp.getSender().getName()+". Action is "+cfp.getContent());
+        if(cfp != null) {
+            try {
+                reply = cfp.createReply();
 
-        if (parent.canHandleRequest(Integer.parseInt(content[0]))) {
-            reply.setPerformative(ACLMessage.PROPOSE);
-            reply.setContent(parent.handleCallForProposal(Integer.parseInt(content[0]), Integer.parseInt(content[1]), content[2], content[3])+"-"+content[4]);
-        } else {
-            reply.setPerformative(ACLMessage.REFUSE);
+                requestToAnswer = (Cfp) cfp.getContentObject();
+
+                if(requestToAnswer == null) {
+                    parent.log("Received null object.");
+                    reply.setPerformative(ACLMessage.REFUSE);
+                    return reply;
+                }
+
+                System.out.println("Agent "+parent.getLocalName()+": CFP received from "+cfp.getSender().getLocalName() + ". Action is "+ requestToAnswer.toString());
+
+                if (parent.canHandleRequest(requestToAnswer.getNumBoxes())) {
+                    reply.setPerformative(ACLMessage.PROPOSE);
+                    //reply.setContent(parent.handleCallForProposal(Integer.parseInt(content[0]), Integer.parseInt(content[1]), content[2], content[3])+"-"+content[4]);
+                } else {
+                    reply.setPerformative(ACLMessage.REFUSE);
+                }
+                return reply;
+            }catch (UnreadableException e) {
+                parent.log("There was an error");
+                parent.log(e.getMessage());
+                reply.setPerformative(ACLMessage.REFUSE);
+                return reply;
+            }
         }
-        return reply;
+        else {
+            block();
+        }
+
+        return null;
     }
 
     protected void handleRejectProposal(ACLMessage cfp) {}

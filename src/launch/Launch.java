@@ -151,7 +151,7 @@ public class Launch extends Boot {
 
                 RequestAgent requester = null;
                 try {
-                    requester = new RequestAgent(i, name, random, random.equals("1") ? numberOfRequests : requestFile);
+                    requester = new RequestAgent(i+1, name, random, random.equals("1") ? numberOfRequests : requestFile);
                     agentsController.add(simulationContainerController.acceptNewAgent(name, requester));
                     numberOfAgents++;
                 } catch (Exception e) {

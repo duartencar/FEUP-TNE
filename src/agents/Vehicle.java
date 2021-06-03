@@ -4,12 +4,13 @@ import behaviours.VehicleReceiveBehaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import logic.AlphaSchedule;
 import logic.Request;
 
 import map.Graph;
 import map.GraphNode;
 import map.search.DijkstraGraph;
-import map.search.DijkstraNode;
+
 
 import logic.Path;
 
@@ -32,6 +33,8 @@ public class Vehicle extends Elementary {
     private float currentLoad;
     private float profit;
     private ArrayList<Request> requests;
+    private AlphaSchedule vehicleSchedule;
+    private DijkstraGraph searchGraph;
 
     public Vehicle(String n, String t, GraphNode sp, float ts, float mc) {
         name = n;
@@ -44,6 +47,8 @@ public class Vehicle extends Elementary {
         currentLoad = 0;
         currentPath = null;
         requests = new ArrayList<Request>();
+        vehicleSchedule = new AlphaSchedule();
+        searchGraph = Graph.getInstance().getGraphToSearch();
     }
 
     public void setup() {

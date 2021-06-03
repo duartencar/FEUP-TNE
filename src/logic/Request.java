@@ -17,6 +17,10 @@ public class Request {
         this.deliveryTime = deliveryTime;
     }
 
+    public Cfp getRequestCfp() {
+        return new Cfp(id, parentId, numBoxes, destination.getId(), deliveryTime);
+    }
+
     public String toString() {
         return numBoxes + "-" + deliveryTime + "-" + destination.getId() + "-time-" + id;
     }

@@ -7,8 +7,11 @@ import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import logic.Cfp;
 import logic.Request;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,9 +28,17 @@ public class MakeContractRequests extends TickerBehaviour {
 
     @Override
     protected void onTick() {
-        Request request = p.getRequestsToPerform().get(p.currentRequest);
+        int i = 0;
+        Cfp cfp = null;
 
-        if(request != null) {
+        for(Request r : p.getRequestsToPerform().values()){
+            if(i == p.currentRequest) {
+                cfp = r.getRequestCfp();
+                break;
+            }
+        }
+
+        if(cfp != null) {
             ACLMessage msg = new ACLMessage(ACLMessage.CFP);
             ArrayList<AID> vehicles = p.getVehicles();
 
@@ -41,9 +52,13 @@ public class MakeContractRequests extends TickerBehaviour {
 
             msg.setReplyByDate(new Date(System.currentTimeMillis() + 500));
 
-            msg.setContent(request.toString());
+            try {
+                msg.setContentObject(cfp);
+            } catch (IOException e) {
+                p.log("couldn't attach object to message");
+            }
 
-            p.log("Starting CFP for: " + request.toString());
+            p.log("Starting CFP for: " + cfp.toString());
 
             p.addBehaviour(new RequestBehaviour(p, msg));
 
