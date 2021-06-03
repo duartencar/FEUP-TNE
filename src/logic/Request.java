@@ -3,13 +3,13 @@ package logic;
 import map.GraphNode;
 
 public class Request {
-    private String id;
-    private String parentId;
+    private int id;
+    private int parentId;
     private int numBoxes;
     private GraphNode destination;
     private int deliveryTime;
 
-    public Request(String id, String parentId, int numBoxes, GraphNode destination, int deliveryTime) {
+    public Request(int id, int parentId, int numBoxes, GraphNode destination, int deliveryTime) {
         this.id = id;
         this.parentId = parentId;
         this.numBoxes = numBoxes;
@@ -17,19 +17,19 @@ public class Request {
         this.deliveryTime = deliveryTime;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getParentId() {
+    public int getParentId() {
         return parentId;
     }
 
-    public void setParentId(String parentId) {
+    public void setParentId(int parentId) {
         this.parentId = parentId;
     }
 

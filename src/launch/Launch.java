@@ -1,38 +1,51 @@
 package launch;
 
+import agents.RequestAgent;
+import agents.Vehicle;
+
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.util.ExtendedProperties;
+import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
+
 import map.Graph;
+import map.GraphNode;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
+import utils.Utils;
 import static utils.Constants.Arguments.*;
 import static utils.Constants.Directories.MAPS_PATH;
 import static utils.Constants.Directories.SIMULATIONS_PATH;
-import static utils.Utils.log;
+import static utils.Utils.*;
+import static utils.Utils.convertToFloat;
 
 public class Launch extends Boot {
     private static ProfileImpl simulationProfile;
     private static ContainerController simulationContainerController;
     private static Properties simulationProperties;
 
+    private static ArrayList<Vehicle> vehicleAgents;
+    private static ArrayList<AgentController> agentsController;
+
     private static void createSimulationContainer(boolean gui) {
         simulationProperties = new ExtendedProperties();
-
-        simulationProfile = new ProfileImpl((jade.util.leap.Properties) simulationProperties);
 
         if(gui) {
             simulationProperties.setProperty(Profile.GUI, "true");
         }
+
+        simulationProfile = new ProfileImpl((jade.util.leap.Properties) simulationProperties);
 
         Runtime.instance().setCloseVM(true);
 
@@ -41,6 +54,8 @@ public class Launch extends Boot {
         } else {
             simulationContainerController = Runtime.instance().createAgentContainer(simulationProfile);
         }
+
+        agentsController = new ArrayList<AgentController>();
     }
 
     /**
@@ -72,7 +87,11 @@ public class Launch extends Boot {
 
     private static int parseVehicleAgents(Document agentsFile) {
         NodeList agentsList = agentsFile.getElementsByTagName("vehicle");
-        int numberOfAgents = 0;
+
+        vehicleAgents = new ArrayList<Vehicle>(agentsList.getLength());
+
+
+        int numberOfAgents = 1;
 
         for(int i = 0; i < agentsList.getLength(); i++) {
             Node agent = agentsList.item(i);
@@ -88,15 +107,26 @@ public class Launch extends Boot {
                 String startNode = element.getAttribute("startNode");
 
                 if(name.equals("") || vehicleType.equals("") || tank.equals("") || capacity.equals("") || pathFindingAlgorithm.equals("")) {
-                    log("Element in line " + i + " is invalid " + element.getBaseURI());
+                    log("Element in line " + i + " is invalid " + element.getBaseURI().toString());
                     continue;
                 }
 
-                /*
-                VehicleAgent vehicle = new VehicleAgent(name, vehicleType, tank, capacity, pathFindingAlgorithm, startNode);
-                simulationContainerController.acceptNewAgent(name, vehicle);
-                */
-                numberOfAgents++;
+                GraphNode startPos = Graph.getInstance().nodes.get(convertToInteger(startNode));
+
+                if(startPos == null) {
+                    log("Element in line " + i + " has an invalid starting position");
+                    continue;
+                }
+
+                try {
+                    Vehicle vehicle = new Vehicle(name, vehicleType, startPos, convertToFloat(tank), convertToFloat(capacity));
+                    vehicleAgents.add(vehicle);
+                    agentsController.add(simulationContainerController.acceptNewAgent(name, vehicle));
+                    numberOfAgents++;
+                } catch (Exception e) {
+                    log("ERROR PARSING VEHICLE: " + e.getMessage());
+                    continue;
+                }
             }
         }
 
@@ -116,13 +146,18 @@ public class Launch extends Boot {
                 String name = element.getAttribute("name");
                 String random = element.getAttribute("random");
                 String numberOfRequests = element.getAttribute("numberOfRequests");
-                String requestFile = element.getAttribute("requestFile");
+                String requestFile = element.getAttribute("requestsFile");
 
-                /*
-                RequesterAgent requester = new RequesterAgent(name, random, numberOfRequests, requestFile);
-                simulationContainerController.acceptNewAgent(name, requester);
-                */
-                numberOfAgents++;
+
+                RequestAgent requester = null;
+                try {
+                    requester = new RequestAgent(i, name, random, random.equals("1") ? numberOfRequests : requestFile);
+                    agentsController.add(simulationContainerController.acceptNewAgent(name, requester));
+                    numberOfAgents++;
+                } catch (Exception e) {
+                    log(e.getMessage());
+                    continue;
+                }
             }
         }
 
@@ -154,6 +189,17 @@ public class Launch extends Boot {
         }
     }
 
+    private static void startAgents() {
+        for(AgentController controller : agentsController) {
+            try {
+                controller.start();
+            } catch (StaleProxyException e) {
+                log("Couldn't start agent");
+                log(e.getMessage());
+            }
+        }
+    }
+
     public static void main(String[] args) {
         
         checkParameters(args);
@@ -169,5 +215,9 @@ public class Launch extends Boot {
             log("Problem with agents file");
             System.exit(0);
         }
+
+        startAgents();
+
+        return;
     }
 }

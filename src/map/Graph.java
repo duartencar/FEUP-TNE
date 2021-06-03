@@ -7,20 +7,24 @@ import org.w3c.dom.NodeList;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.TreeSet;
 
-import static utils.Utils.convertToInteger;
-import static utils.Utils.log;
+import static utils.Utils.*;
 
 public class Graph {
     public HashMap<Integer, GraphNode> nodes;
     public LinkedList<GraphElement> elements;
     private boolean valid;
 
+    private int headQuarter = -1;
+    public TreeSet<Integer> gasStations;
+
     private static Graph instance = null;
 
     private Graph() {
         elements = new LinkedList<GraphElement>();
         valid = false;
+        gasStations = new TreeSet<Integer>();
     }
 
     public static Graph getInstance() {
@@ -103,8 +107,17 @@ public class Graph {
                 String x = element.getAttribute("positionX");
                 String y = element.getAttribute("positionY");
                 String name = element.getAttribute("mainText");
+                String special = element.getAttribute("special");
+
 
                 GraphNode newNode = new GraphNode(id, x, y, name);
+
+                if(special.equals("HQ")) {
+                    headQuarter = convertToInteger(id);
+                }
+                else if(special.equals("GS")) {
+                    gasStations.add(convertToInteger(id));
+                }
 
                 if(this.nodes.containsKey(newNode.getId())) {
                     log("Map has nodes with the same Id's");
@@ -116,7 +129,7 @@ public class Graph {
             }
         }
 
-        return true;
+        return headQuarter != - 1 && gasStations.size() != 0;
     }
 
 
@@ -126,6 +139,20 @@ public class Graph {
         }
 
         return null;
+    }
+
+    public GraphNode getRandomLocation() {
+        GraphNode toReturn = null;
+
+        do {
+            int random = generateInt(getNumberOfNodes());
+
+            if(random != headQuarter && !gasStations.contains(random)) {
+                toReturn = nodes.get(random);
+            }
+        } while(toReturn == null);
+
+        return toReturn;
     }
 
     public int getNumberOfNodes() {

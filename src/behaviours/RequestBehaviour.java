@@ -27,7 +27,7 @@ public class RequestBehaviour extends ContractNetInitiator {
         ACLMessage msg;
         Proposal(Request req) {
             this.request = req;
-            bestOffer = 999999;
+            bestOffer = Integer.MAX_VALUE;
             offerer = null;
             msg = null;
         }
@@ -43,6 +43,7 @@ public class RequestBehaviour extends ContractNetInitiator {
     private GraphNode destination;
     private int deliveryTime;
  */
+    @Override
     protected Vector prepareCfps(ACLMessage cfp) {
         Vector<ACLMessage> cfps = new Vector<>();
         ArrayList<Request> requests = this.parent.getRequests();
@@ -54,7 +55,7 @@ public class RequestBehaviour extends ContractNetInitiator {
 
         for (Request request : requests) {
             Proposal proposal = new Proposal(request);
-            proposals.put(request.getId(), proposal);
+            proposals.put(request.getId() + "", proposal);
             String createMessage = "";
             createMessage += request.getNumBoxes()+"-"+request.getDeliveryTime()+"-"+request.getDestination().getId()+"-time-"+request.getId();
             cfp.setContent(createMessage);

@@ -13,6 +13,8 @@ import map.GraphNode;
 
 import java.util.Map;
 
+import static utils.Utils.convertToInteger;
+
 public class VehicleReceiveBehaviour extends ContractNetResponder {
     private final Vehicle parent;
     public VehicleReceiveBehaviour(Vehicle a) {
@@ -49,7 +51,7 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
                     break;
                 }
             }
-            Request req = new Request(content[0],content[4],Integer.parseInt(content[3]), node, Integer.parseInt(content[1]));
+            Request req = new Request(convertToInteger(content[0]), convertToInteger(content[4]),Integer.parseInt(content[3]), node, Integer.parseInt(content[1]));
             this.parent.addRequest(req);
             reply.setPerformative(ACLMessage.INFORM);
         }
