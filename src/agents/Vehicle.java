@@ -13,6 +13,8 @@ import map.search.DijkstraGraph;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,6 +33,9 @@ public class Vehicle extends Elementary {
     private final float tankSize;
     private final float maxCapacity;
     private float currentLoad;
+    private float distanceCovered = 0;
+    private float fuelConsumed = 0;
+    private float fuelExpenses = 0;
     private float profit;
     private TreeSet<Integer> utilityNodes;
     private ArrayList<Request> requests;
@@ -39,6 +44,7 @@ public class Vehicle extends Elementary {
     private DistributedLogistics gui;
     private ConcurrentHashMap<Integer, Proposal> proposals;
     public Color agentColor;
+    private long simulationStartTime;
 
     public Vehicle(String n, String t, GraphNode sp, float ts, float mc) {
         name = n;
@@ -54,6 +60,7 @@ public class Vehicle extends Elementary {
         searchGraph = Graph.getInstance().getGraphToSearch();
         utilityNodes = new TreeSet<Integer>();
         proposals = new ConcurrentHashMap<Integer, Proposal>();
+        simulationStartTime = Calendar.getInstance().getTimeInMillis();
     }
 
     public DistributedLogistics getGui() {
@@ -141,6 +148,24 @@ public class Vehicle extends Elementary {
                 searchGraph.getMinimumPathFromSchedule(destination, schedule, utilityNodes);
 
         return path;
+    }
+
+    public synchronized boolean addAcceptedProposalToSchedule(Proposal p) {
+
+        try {
+            Task t = new Task(new Path(p.getProposedPath()), p.getCfpId(), new Date(simulationStartTime + (p.getMinutes() * 60 * 1000)));
+            schedule.addTask(t);
+        } catch (Exception e) {
+            log("Couldn't create task.");
+            return false;
+        }
+
+        currentLoad += p.getLoadIfAccepts();
+        distanceCovered += p.getTotalDistance();
+        fuelConsumed += p.getConsumption();
+        fuelExpenses += p.getPrice();
+
+        return true;
     }
 
     public boolean addRequest(Request newRequest) {

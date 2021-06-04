@@ -42,7 +42,7 @@ public class MakeContractRequests extends TickerBehaviour {
 
             msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
 
-            msg.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
+            msg.setReplyByDate(new Date(System.currentTimeMillis() + 3000));
 
             try {
                 msg.setContentObject(cfp);

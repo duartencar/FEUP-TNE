@@ -1,6 +1,7 @@
 package behaviours;
 
 import agents.Vehicle;
+import jade.domain.FIPAAgentManagement.FailureException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -51,6 +52,8 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
                     reply.setPerformative(ACLMessage.REFUSE);
                 }
 
+                parent.log("Sent my proposal to " + requestToAnswer.getId());
+
                 return reply;
             }catch (UnreadableException e) {
                 parent.log("There was an error");
@@ -71,14 +74,33 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
         return null;
     }
 
-    protected void handleRejectProposal(ACLMessage cfp) {
-        parent.log("My offer was rejected");
+    protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
+        //parent.log("My offer was rejected");
     }
 
-    protected ACLMessage handleAcceptProposal(ACLMessage cfp) {
+    @Override
+    protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
 
-        parent.log("My offer was accepted");
-        ACLMessage reply = cfp.createReply();
+        //parent.log("My offer was accepted");
+        ACLMessage inform = cfp.createReply();
+        Proposal doneProposal = null;
+
+        try {
+            doneProposal = (Proposal)propose.getContentObject();
+            if(parent.addAcceptedProposalToSchedule(doneProposal)) {
+                inform.setPerformative(ACLMessage.INFORM);
+            }
+            else {
+                inform.setPerformative(ACLMessage.INFORM);
+            }
+        } catch (UnreadableException unreadableException) {
+            parent.log("Failed to get proposal from object: " + unreadableException.getMessage());
+            throw new FailureException(unreadableException.getMessage());
+        }
+
+        parent.log("Accepted new proposal, my shcedule now is: " + parent.getSchedule().toString());
+
+
         //TODO: check if no new better offer
         /*if (true) {
             //Request(String id, String parentId, int numBoxes, GraphNode destination, int deliveryTime)
@@ -98,6 +120,6 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
         }
         else
             reply.setPerformative(ACLMessage.FAILURE);*/
-        return reply;
+        return inform;
     }
 }

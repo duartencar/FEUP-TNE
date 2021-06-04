@@ -8,6 +8,7 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetInitiator;
 import logic.Proposal;
 
+import java.io.IOException;
 import java.util.*;
 
 public class RequestBehaviour extends ContractNetInitiator {
@@ -42,7 +43,7 @@ public class RequestBehaviour extends ContractNetInitiator {
         nResponders--;
     }
 
-    @Override
+
     protected void handleAllResponses(Vector responses, Vector acceptances) {
 
         if (responses.size() < nResponders) {
@@ -73,7 +74,7 @@ public class RequestBehaviour extends ContractNetInitiator {
                     parent.log("Failed to get proposal from object: " + unreadableException.getMessage());
                     return;
                 }
-                parent.log("RECEIVED: " + content.toString());
+                // parent.log("RECEIVED: " + content.toString());
                 float evaluation = parent.evaluateProposal(content);
                 if(evaluation < bestEvaluation) {
                     bestProposal = content;
@@ -85,9 +86,13 @@ public class RequestBehaviour extends ContractNetInitiator {
         }
 
         if(accept != null) {
-            parent.log("Accepting proposal "+ bestProposal.toString() + " from vehicle "+bestProposer.getLocalName());
+            parent.log("Accepting proposal "+ bestProposal.toString() + " from vehicle " + bestProposer.getLocalName());
             accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
         }
+    }
+
+    protected void handleInform(ACLMessage inform) {
+        parent.log("Agent scheduled task.");
     }
 
     /*protected void handlePropose(ACLMessage propose) {
