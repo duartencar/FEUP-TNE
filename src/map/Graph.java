@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -38,6 +39,18 @@ public class Graph {
 
     public boolean isValid() {
         return valid;
+    }
+
+    public ArrayList<Integer> getUtilityNodes(){
+        ArrayList<Integer> ids = new ArrayList<Integer>(gasStations.size() + 1);
+
+        ids.add(0, headQuarter);
+
+        for(Integer gs : gasStations) {
+            ids.add(gs);
+        }
+
+        return ids;
     }
 
     private boolean processEdges(NodeList edges) {
@@ -178,5 +191,36 @@ public class Graph {
 
     public boolean init(NodeList nodes, NodeList edges) {
         return processNodes(nodes) && processEdges(edges);
+    }
+
+    public int[] getPathCosts(ArrayList<Integer> path) {
+        int[] costs = new int[2];
+
+        /**
+         * 0 - weight/time
+         * 1 - distance
+         */
+        costs[0] = 0;
+        costs[1] = 0;
+
+        for(int i = 0; i < path.size() - 1; i++) {
+            GraphNode curr = nodes.get(path.get(i));
+            GraphNode next = nodes.get(path.get(i + 1));
+
+            int diffX = next.getX() - curr.getX();
+            int diffY = next.getY() - curr.getY();
+
+            costs[1] += (int)(Math.sqrt(diffX*diffX + diffY*diffY));
+
+            for(GraphEdge e : curr.getEdges()) {
+
+                if(e.getTarget().getId() == next.getId()) {
+                    costs[0] += e.getWeight();
+                    break;
+                }
+            }
+        }
+
+        return costs;
     }
 }

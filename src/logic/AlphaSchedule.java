@@ -46,6 +46,18 @@ public class AlphaSchedule {
         return fullPath;
     }
 
+    public ArrayList<Integer> getScheduleMainPoints() {
+        ArrayList<Integer> mainPoints = new ArrayList<Integer>(tasks.size() * 2);
+
+        mainPoints.add(tasks.get(0).getStart().getId());
+
+        for(Task t : tasks) {
+            mainPoints.add(t.getEnd().getId());
+        }
+
+        return mainPoints;
+    }
+
     public synchronized void addTask(Task task) {
         GraphNode start = task.getStart(), end = task.getEnd();
 

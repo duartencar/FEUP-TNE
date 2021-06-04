@@ -127,4 +127,35 @@ public class AlphaSheduleTest {
         assertEquals(p1.getWeight() + p2.getWeight() + auxPath.getWeight(), sc.getTotalScheduleCost(), "Cost should be the same as the sum of previous paths from previous test");
         assertEquals(3, sc.numberOfTasks(), "Number of tasks should be 3");
     }
+
+    @Test
+    void testGetMainPoints() {
+        DijkstraGraph sg = getGraph().getGraphToSearch();
+        ArrayList<Integer> path1 = sg.findPath(1, 5);
+        ArrayList<Integer> path2 = sg.findPath(5, 2);
+        ArrayList<Integer> path3 = sg.findPath(2, 7);
+        AlphaSchedule sc = new AlphaSchedule();
+
+        Path p1 = null, p2 = null, p3 = null;
+
+        try {
+            p1 = new Path(path1);
+            p2 = new Path(path2);
+            p3 = new Path(path3);
+            sc.addTask(new Task(p1, 1, new Date()));
+            sc.addTask(new Task(p2, 2, new Date()));
+            sc.addTask(new Task(p3, 3, new Date()));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            fail();
+        }
+
+        String toTest = "";
+
+        for(Integer id : sc.getScheduleMainPoints()) {
+            toTest += id + " ";
+        }
+
+        assertEquals("1 5 2 7 ", toTest, "string should be: 1 5 2 7 ");
+    }
 }

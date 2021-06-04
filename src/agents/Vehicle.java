@@ -4,68 +4,66 @@ import behaviours.VehicleReceiveBehaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import agents.behaviours.GenerateRandomTasks;
 import gui.DistributedLogistics;
-import logic.AlphaSchedule;
-import logic.Request;
+import logic.*;
 
 import map.Graph;
 import map.GraphNode;
 import map.search.DijkstraGraph;
 
-
-import logic.Path;
-
-import utils.Utils;
-
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_NAME;
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_TYPE;
 
+import utils.Utils;
+
+import static utils.Constants.AgentsProperties.VehicleAgent.VehicleProperties.*;
 import static utils.Utils.generateFloat;
-import static utils.Utils.generateInt;
 
 public class Vehicle extends Elementary {
-    private final GraphNode startPos;
-    private GraphNode currentPos;
+    private final GraphNode startPosition;
     private final String type;
     private final String name;
-    private Path currentPath;
     private final float tankSize;
     private final float maxCapacity;
     private float currentLoad;
     private float profit;
+    private TreeSet<Integer> utilityNodes;
     private ArrayList<Request> requests;
-    private AlphaSchedule vehicleSchedule;
     private DijkstraGraph searchGraph;
-
-
-
     private AlphaSchedule schedule;
     private DistributedLogistics gui;
-    public int numberOfRequests = 0;
+    private ConcurrentHashMap<Integer, Proposal> proposals;
     public Color agentColor;
 
     public Vehicle(String n, String t, GraphNode sp, float ts, float mc) {
         name = n;
         type = t;
-        startPos = sp;
-        currentPos = sp;
+        startPosition = sp;
         tankSize = ts;
         maxCapacity = mc;
         profit = 0;
         currentLoad = 0;
-        currentPath = null;
         requests = new ArrayList<Request>();
         schedule = new AlphaSchedule();
         agentColor = new Color(generateFloat(), generateFloat(), generateFloat());
+        searchGraph = Graph.getInstance().getGraphToSearch();
+        utilityNodes = new TreeSet<Integer>();
+        proposals = new ConcurrentHashMap<Integer, Proposal>();
     }
 
     public DistributedLogistics getGui() {
         return gui;
+    }
+
+    public void setUtilityNodes(ArrayList<Integer> ids) {
+        for(Integer id: ids) {
+            utilityNodes.add(id);
+        }
     }
 
     public void setColor(Color c) {
@@ -97,24 +95,16 @@ public class Vehicle extends Elementary {
         addBehaviour(new VehicleReceiveBehaviour(this, template));
     }
 
+    public GraphNode getStartPosition() {
+        return startPosition;
+    }
+
     public String getVehicleName() {
         return name;
     }
 
     public String getType() {
         return type;
-    }
-
-    public GraphNode getStartPos() {
-        return startPos;
-    }
-
-    public Path getCurrentPath() {
-        return currentPath;
-    }
-
-    public void setCurrentPath(Path currentPath) {
-        this.currentPath = currentPath;
     }
 
     public double getTankSize() {
@@ -145,6 +135,14 @@ public class Vehicle extends Elementary {
         return requests;
     }
 
+    public synchronized ArrayList<Integer> getPathTo(int destination) {
+        ArrayList<Integer> path = schedule.numberOfTasks() == 0 ?
+                searchGraph.findPath(startPosition.getId(), destination) :
+                searchGraph.getMinimumPathFromSchedule(destination, schedule, utilityNodes);
+
+        return path;
+    }
+
     public boolean addRequest(Request newRequest) {
         if (currentLoad + newRequest.getNumBoxes() > maxCapacity) {
             //TODO: check if new request exceeds gas tank by checking consumption (requires the pathfinding algorithm)
@@ -168,25 +166,36 @@ public class Vehicle extends Elementary {
         }
     }
 
-    public double consumption(int speed, double gasPrice) {
-        //Let’s settle on an average of around 30 or 40 litres every 100 km. src: https://www.webfleet.com/en_gb/webfleet/blog/do-you-know-the-diesel-consumption-of-a-lorry-per-km/
-        /*
-        25.000kg - 35l/100km
-        16.000Kg - 25l/100km
-        (35-25)/(25.000-16.000) = 10/9.000 =  0.01/9 = 0.0011111L/100km.kg
-        para simplificar, vou assumir que cada caixa pesa 1000Kg
-        Consumo base (sem carga):
-        15 L/100km (estou a assumir, can be completely wrong though)
-        para a influencia da velocidade, vou multiplicar o resultado do resto pelo exponencial da velocidade a dividir por 100, com os valores truncados a 120 (porque os camioes nao andam mais que isso)
-        isto faz com que o consumo parado seja o resultado da conta anterior (porque gasta enquanto parado), a 50km/h multiplicado por 1.649 e a 100km/h multiplicado por 2.718 (parece-me realista)
-        caso queiramos que o consumo enquanto parado seja 0 (porque pode desligar o motor, idk) podemos usar em vez do exponencial (velocidade/50)². Assim a 0 fica a 0, a 50 fica miplicado por 1 e a 100
-        fica multiplicado por 4
-         */
-        double consumption = 15 + currentLoad/9;
-        //consumption *= Math.pow(speed/50,2);
-        consumption *= Math.exp((float)speed/100.0);
+    public float consumption(float distance) {
+        float consumptionRatio = 0;
 
-        return consumption;
+        if(type.equals(ELECTRIC_TYPE)) {
+            consumptionRatio = ELECTRIC_CONSUMPTION;
+        }
+        else if(type.equals(GAS_TYPE)) {
+            consumptionRatio = GAS_CONSUMPTION;
+        }
+        else if(type.equals(DIESEL_TYPE)) {
+            consumptionRatio = DIESEL_CONSUMPTION;
+        }
+
+        return distance * consumptionRatio / 100f;
+    }
+
+    public float budget(float consumption) {
+        float pricePerEnergy = 0;
+
+        if(type.equals(ELECTRIC_TYPE)) {
+            pricePerEnergy = ELECTRIC_COST;
+        }
+        else if(type.equals(GAS_TYPE)) {
+            pricePerEnergy = GAS_COST;
+        }
+        else if(type.equals(DIESEL_TYPE)) {
+            pricePerEnergy = DIESEL_COST;
+        }
+
+        return consumption * pricePerEnergy;
     }
 
     public boolean canHandleRequest(int numBoxes) {
@@ -194,17 +203,40 @@ public class Vehicle extends Elementary {
         return (currentLoad+numBoxes <= maxCapacity);
     }
 
-    public String handleCallForProposal(int numBoxes, int time, String destinationNode, String pathChoosing) {
+    public Proposal handleCallForProposal(Cfp cfp) {
         //TODO: use a pathfinding algorithm to see how long it would take for it to distribute the request
         /*
         distance traveled: 25
         loadIfAccepts: 85%
 	    costIfAccepts: 8€
          */
-        String ret = "";
-        int load = (int) ((currentLoad+numBoxes)*100/maxCapacity);
-        DijkstraGraph map = Graph.getInstance().getGraphToSearch();
-        ArrayList<Request> auxRequests = new ArrayList<>();
+        ArrayList<Integer> bestPath = getPathTo(cfp.getDestination());
+
+        int load = (int) ((currentLoad + cfp.getNumBoxes()) * 100 / maxCapacity);
+
+        int[] costs = Graph.getInstance().getPathCosts(bestPath);
+
+        int minutes = costs[0];
+        float distance = costs[1] / 100.0f; // divide pixel distance for 100 to get distance in km
+        float consumption = consumption(distance);
+        float budget = budget(consumption);
+
+        Proposal toPropose = new Proposal(
+                                            cfp.getId(),
+                                            cfp.getParentId(),
+                                            getAID(),
+                                            bestPath,
+                                            load,
+                                            minutes,
+                                            distance,
+                                            consumption,
+                                            budget);
+
+        proposals.put(cfp.getId(), toPropose);
+
+        log(toPropose.toString());
+
+        /*ArrayList<Request> auxRequests = new ArrayList<>();
         ArrayList<GraphNode> path = new ArrayList<>();
         GraphNode before = null, after = null;
         if (pathChoosing.contains("time")) {
@@ -221,7 +253,7 @@ public class Vehicle extends Elementary {
         } else if (pathChoosing.contains("path")) {
             int min = 99999999;
             int pos = requests.size();
-            for (Request req: requests) {
+            for (Request req : requests) {
                 //TODO: append here
                 before = req.getDestination();
                 after = req.getDestination();
@@ -230,24 +262,24 @@ public class Vehicle extends Elementary {
 
         //TODO: calculate detour cost
         int prev = -1, curr = -1, next = -1;
-        for (Map.Entry node: Graph.getInstance().nodes.entrySet()) {
+        for (Map.Entry node : Graph.getInstance().nodes.entrySet()) {
             if (node.getValue().equals(destinationNode)) {
-                curr = (int)node.getKey();
+                curr = (int) node.getKey();
                 break;
             }
         }
         if (before != null) {
-            for (Map.Entry node: Graph.getInstance().nodes.entrySet()) {
+            for (Map.Entry node : Graph.getInstance().nodes.entrySet()) {
                 if (node.getValue().equals(before)) {
-                    prev = (int)node.getKey();
+                    prev = (int) node.getKey();
                     break;
                 }
             }
         }
         if (after != null) {
-            for (Map.Entry node: Graph.getInstance().nodes.entrySet()) {
+            for (Map.Entry node : Graph.getInstance().nodes.entrySet()) {
                 if (node.getValue().equals(after)) {
-                    next = (int)node.getKey();
+                    next = (int) node.getKey();
                     break;
                 }
             }
@@ -260,9 +292,11 @@ public class Vehicle extends Elementary {
         if (next != -1) {
             ArrayList<Integer> p = map.findPath(curr, next);
             cost += p.size();
-        }
+        }*/
 
-        return ret+cost;
+        return toPropose;
+    }
+
     public void paint(Graphics g, int x, int y, int width, int height) {
         g.setColor(new Color(255, 255, 255));
         g.fillRect(x, y, width, height);

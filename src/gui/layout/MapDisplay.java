@@ -33,7 +33,7 @@ public class MapDisplay extends Canvas {
         UiNode previous, current, next;
 
         for(Vehicle v: agents) {
-            graph.nodes.get(v.getStartPos().getId()).setAgentPos(v.getColor());
+            graph.nodes.get(v.getStartPosition().getId()).setAgentPos(v.getColor());
 
             fullPath = v.getSchedule().getFullPath();
             for(int i = 0; i < fullPath.size() - 1; i++ ){

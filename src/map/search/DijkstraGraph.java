@@ -1,10 +1,12 @@
 package map.search;
 
+import logic.AlphaSchedule;
 import map.GraphEdge;
 import map.GraphNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import static utils.Utils.log;
 
@@ -61,7 +63,82 @@ public class DijkstraGraph {
         return queue.remove(0);
     }
 
-    public ArrayList<Integer> findPath(Integer start, Integer end) {
+    public synchronized ArrayList<Integer> getMinimumPathFromSchedule(Integer start, AlphaSchedule sc, TreeSet<Integer> utilityNodes) {
+        ArrayList<Integer> scheduleTasks = sc.getScheduleMainPoints();
+        DijkstraNode aux = null;
+        ArrayList<Integer> answer = new ArrayList<Integer>(2);
+        int selectableMainPoints = 0;
+        DijkstraNode begin = nodes.get(start);
+
+        if(begin == null) {
+            log(start + " doesn't exist");
+            return null;
+        }
+
+        for(int i = scheduleTasks.size() - 1; i <= 0; i--) {
+            if(nodes.get(scheduleTasks.get(i)) == null) {
+                log(scheduleTasks.get(i) + " doesn't exist");
+                return null;
+            }
+
+            if(selectableMainPoints == 0 && utilityNodes.contains(scheduleTasks.get(i))) {
+                selectableMainPoints = i;
+            }
+        }
+
+        reset();
+
+        begin.distance = 0;
+
+        addToQueue(begin);
+
+        while(queue.size() != 0) {
+
+            aux = getQueueMin();
+
+            if(aux.isVisited()) {
+                continue;
+            }
+
+            for(int i = scheduleTasks.size()-1; i >= selectableMainPoints; i--) {
+                if(aux.getId() == scheduleTasks.get(i)) {
+                    break;
+                }
+            }
+
+            //log("Visiting " + aux.getId());
+
+            for(DijkstraEdge edge : aux.getEdges()) {
+
+                DijkstraNode auxDest = edge.getTarget();
+
+                if(auxDest.isVisited()) {
+                    //log(auxDest.getId() + " already visited.");
+                    continue;
+                }
+
+                if(aux.getDistance() + edge.getWeight() < auxDest.getDistance()) {
+                    auxDest.setDistance((short) (aux.getDistance() + edge.getWeight()));
+                    auxDest.setPrevious(aux);
+
+                    //log("updated " + auxDest.getId() + ": distance is " + auxDest.getDistance() + " coming from " + aux.getId());
+
+                    addToQueue(auxDest);
+                }
+            }
+
+            aux.setVisited();
+        }
+
+        while(aux.getPrevious() != null) {
+            answer.add(aux.getId());
+            aux = aux.getPrevious();
+        }
+
+        return answer;
+    }
+
+    public synchronized ArrayList<Integer> findPath(Integer start, Integer end) {
         reset();
 
         ArrayList<Integer> answer = new ArrayList<Integer>(2);

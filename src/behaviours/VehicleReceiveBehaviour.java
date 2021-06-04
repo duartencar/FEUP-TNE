@@ -6,10 +6,12 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetResponder;
 import logic.Cfp;
+import logic.Proposal;
 import logic.Request;
 import map.Graph;
 import map.GraphNode;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static utils.Utils.convertToInteger;
@@ -39,17 +41,24 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
                     return reply;
                 }
 
-                System.out.println("Agent "+parent.getLocalName()+": CFP received from "+cfp.getSender().getLocalName() + ". Action is "+ requestToAnswer.toString());
+                //System.out.println("Agent "+parent.getLocalName()+": CFP received from "+cfp.getSender().getLocalName() + ". Action is "+ requestToAnswer.toString());
 
                 if (parent.canHandleRequest(requestToAnswer.getNumBoxes())) {
                     reply.setPerformative(ACLMessage.PROPOSE);
-                    //reply.setContent(parent.handleCallForProposal(Integer.parseInt(content[0]), Integer.parseInt(content[1]), content[2], content[3])+"-"+content[4]);
+                    final Proposal answer = parent.handleCallForProposal(requestToAnswer);
+                    reply.setContentObject(answer);
                 } else {
                     reply.setPerformative(ACLMessage.REFUSE);
                 }
+
                 return reply;
             }catch (UnreadableException e) {
                 parent.log("There was an error");
+                parent.log(e.getMessage());
+                reply.setPerformative(ACLMessage.REFUSE);
+                return reply;
+            } catch (IOException e) {
+                parent.log("Couldn't bind proposal to message");
                 parent.log(e.getMessage());
                 reply.setPerformative(ACLMessage.REFUSE);
                 return reply;

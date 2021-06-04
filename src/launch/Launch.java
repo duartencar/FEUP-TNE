@@ -220,8 +220,9 @@ public class Launch extends Boot {
         }
     }
 
-    private static void addGuiReferenceToAgents(DistributedLogistics g) {
+    private static void addGuiReferenceAndSetUtilityNodes(DistributedLogistics g) {
         for(Vehicle v: vehicleAgents) {
+            v.setUtilityNodes(Graph.getInstance().getUtilityNodes());
             v.setGui(g);
         }
     }
@@ -244,7 +245,7 @@ public class Launch extends Boot {
 
         try {
             DistributedLogistics d = new DistributedLogistics(vehicleAgents);
-            addGuiReferenceToAgents(d);
+            addGuiReferenceAndSetUtilityNodes(d);
         } catch (Exception e) {
             log("GUI exception: " + e.getMessage());
             System.exit(0);
