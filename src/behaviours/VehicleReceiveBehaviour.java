@@ -71,12 +71,16 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
         return null;
     }
 
-    protected void handleRejectProposal(ACLMessage cfp) {}
+    protected void handleRejectProposal(ACLMessage cfp) {
+        parent.log("My offer was rejected");
+    }
 
     protected ACLMessage handleAcceptProposal(ACLMessage cfp) {
+
+        parent.log("My offer was accepted");
         ACLMessage reply = cfp.createReply();
         //TODO: check if no new better offer
-        if (true) {
+        /*if (true) {
             //Request(String id, String parentId, int numBoxes, GraphNode destination, int deliveryTime)
             //prop.request.getId() + "-" + prop.request.getDeliveryTime() + "-" + prop.request.getDestination() + "-" + prop.request.getNumBoxes() + "-" + this.parent.getName()
             String[] content = cfp.getContent().split("-");
@@ -93,7 +97,7 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
             reply.setPerformative(ACLMessage.INFORM);
         }
         else
-            reply.setPerformative(ACLMessage.FAILURE);
+            reply.setPerformative(ACLMessage.FAILURE);*/
         return reply;
     }
 }

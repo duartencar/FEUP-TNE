@@ -167,11 +167,11 @@ public class Launch extends Boot {
                 String random = element.getAttribute("random");
                 String numberOfRequests = element.getAttribute("numberOfRequests");
                 String requestFile = element.getAttribute("requestsFile");
-
+                char heuristic = element.getAttribute("heuristic").charAt(0);
 
                 RequestAgent requester = null;
                 try {
-                    requester = new RequestAgent(i+1, name, random, random.equals("1") ? numberOfRequests : requestFile);
+                    requester = new RequestAgent(i+1, name, random, random.equals("1") ? numberOfRequests : requestFile, heuristic);
                     agentsController.add(simulationContainerController.acceptNewAgent(name, requester));
                     numberOfAgents++;
                 } catch (Exception e) {

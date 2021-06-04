@@ -203,7 +203,7 @@ public class Vehicle extends Elementary {
         return (currentLoad+numBoxes <= maxCapacity);
     }
 
-    public Proposal handleCallForProposal(Cfp cfp) {
+    public synchronized Proposal handleCallForProposal(Cfp cfp) {
         //TODO: use a pathfinding algorithm to see how long it would take for it to distribute the request
         /*
         distance traveled: 25
@@ -234,7 +234,7 @@ public class Vehicle extends Elementary {
 
         proposals.put(cfp.getId(), toPropose);
 
-        log(toPropose.toString());
+        //log(toPropose.toString());
 
         /*ArrayList<Request> auxRequests = new ArrayList<>();
         ArrayList<GraphNode> path = new ArrayList<>();

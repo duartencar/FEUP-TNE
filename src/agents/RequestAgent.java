@@ -3,6 +3,7 @@ package agents;
 import behaviours.MakeContractRequests;
 import behaviours.RequestBehaviour;
 import jade.core.AID;
+import logic.Proposal;
 import logic.Request;
 
 import map.Graph;
@@ -28,12 +29,14 @@ public class RequestAgent extends Elementary {
     final private int id;
     final private String agentName;
     final private int mode;
+    final private char heuristic;
     final private HashMap<Integer, Request> requests;
     final private ArrayList<Request> requests_old;
     public int currentRequest = 0;
 
-    public RequestAgent(int id, String name, String randomRequests, String fileOrNumberOfRequests) throws Exception {
+    public RequestAgent(int id, String name, String randomRequests, String fileOrNumberOfRequests, char heuristic) throws Exception {
         this.id=id;
+        this.heuristic = heuristic;
         agentName = name;
         mode = convertToInteger(randomRequests);
         requests = new HashMap<Integer, Request>();
@@ -144,5 +147,31 @@ public class RequestAgent extends Elementary {
             Request newRequest = generateRequest(i,1 + generateInt(8), g.getRandomLocation(), "1200");
             requests.put(newRequest.getId(), newRequest);
         }
+    }
+
+    float absoluteDistanceHeuristic(Proposal p) {
+        return p.getTotalDistance();
+    }
+
+    float absoluteCost(Proposal p) {
+        return p.getPrice();
+    }
+
+    public float evaluateProposal(Proposal p) {
+        float evaluation = Float.MAX_VALUE;
+
+        switch(heuristic) {
+            case 'D':
+                evaluation = absoluteDistanceHeuristic(p);
+                break;
+            case 'C':
+                evaluation = absoluteCost(p);
+                break;
+            default:
+                evaluation = absoluteDistanceHeuristic(p);
+                break;
+        }
+
+        return evaluation;
     }
 }
