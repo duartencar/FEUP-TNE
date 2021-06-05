@@ -41,16 +41,18 @@ public class Graph {
         return valid;
     }
 
-    public ArrayList<Integer> getUtilityNodes(){
-        ArrayList<Integer> ids = new ArrayList<Integer>(gasStations.size() + 1);
-
-        ids.add(0, headQuarter);
+    public ArrayList<Integer> getGasStations(){
+        ArrayList<Integer> ids = new ArrayList<Integer>(gasStations.size());
 
         for(Integer gs : gasStations) {
             ids.add(gs);
         }
 
         return ids;
+    }
+
+    public int getHeadQuarter() {
+        return headQuarter;
     }
 
     private boolean processEdges(NodeList edges) {
@@ -149,7 +151,7 @@ public class Graph {
 
     public DijkstraGraph getGraphToSearch() {
         if(valid) {
-            return new DijkstraGraph(nodes);
+            return new DijkstraGraph(nodes, headQuarter, gasStations);
         }
 
         return null;

@@ -12,7 +12,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AlphaSheduleTest {
+public class AlphaScheduleTest {
     private Graph getGraph() {
         Graph a = Graph.getInstance();
 
@@ -31,7 +31,7 @@ public class AlphaSheduleTest {
     public void testCreate() {
         getGraph();
 
-        AlphaSchedule toTest = new AlphaSchedule();
+        AlphaSchedule toTest = new AlphaSchedule(1);
 
         assertEquals("Empty", toTest.toString(), "Path should be: Empty");
         assertEquals((short)0, toTest.getTotalScheduleCost(), "Total cost should be 0");
@@ -44,13 +44,13 @@ public class AlphaSheduleTest {
 
         ArrayList<Integer> path = toTest.findPath(1, 5);
 
-        AlphaSchedule sc = new AlphaSchedule();
+        AlphaSchedule sc = new AlphaSchedule(1);
 
         Path p = null;
 
         try {
             p = new Path(path);
-            sc.addTask(new Task(p, 1, new Date()));
+            sc.addTask(new Task(p, 1, new Date(), 0, 10, 1, 1));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             fail();
@@ -67,7 +67,7 @@ public class AlphaSheduleTest {
         ArrayList<Integer> path1 = sg.findPath(1, 5);
         ArrayList<Integer> path2 = sg.findPath(5, 2);
         ArrayList<Integer> path3 = sg.findPath(2, 7);
-        AlphaSchedule sc = new AlphaSchedule();
+        AlphaSchedule sc = new AlphaSchedule(1);
 
         Path p1 = null, p2 = null, p3 = null;
 
@@ -75,9 +75,9 @@ public class AlphaSheduleTest {
             p1 = new Path(path1);
             p2 = new Path(path2);
             p3 = new Path(path3);
-            sc.addTask(new Task(p1, 1, new Date()));
-            sc.addTask(new Task(p2, 2, new Date()));
-            sc.addTask(new Task(p3, 3, new Date()));
+            sc.addTask(new Task(p1, 1, new Date(), 0, 10, 1, 1));
+            sc.addTask(new Task(p2, 2, new Date(), 0, 10, 1, 1));
+            sc.addTask(new Task(p3, 3, new Date(), 0, 10, 1, 1));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             fail();
@@ -95,15 +95,15 @@ public class AlphaSheduleTest {
         ArrayList<Integer> path2 = sg.findPath(5, 2);
         ArrayList<Integer> aux = sg.findPath(2, 7);
         ArrayList<Integer> path3 = sg.findPath(5, 7);
-        AlphaSchedule sc = new AlphaSchedule();
+        AlphaSchedule sc = new AlphaSchedule(1);
 
         Path p1 = null, p2 = null, p3 = null, auxPath = null;
 
         try {
             p1 = new Path(path1);
             p3 = new Path(path3);
-            sc.addTask(new Task(p1, 1, new Date()));
-            sc.addTask(new Task(p3, 3, new Date()));
+            sc.addTask(new Task(p1, 1, new Date(), 0, 10, 1, 1));
+            sc.addTask(new Task(p3, 3, new Date(), 0, 10, 1, 1));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             fail();
@@ -116,7 +116,7 @@ public class AlphaSheduleTest {
         try {
             p2 = new Path(path2);
             auxPath = new Path(aux);
-            sc.addTask(new Task(p2, 2, new Date()));
+            sc.addTask(new Task(p2, 2, new Date(), 0, 10, 1, 1));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             fail();
@@ -134,7 +134,7 @@ public class AlphaSheduleTest {
         ArrayList<Integer> path1 = sg.findPath(1, 5);
         ArrayList<Integer> path2 = sg.findPath(5, 2);
         ArrayList<Integer> path3 = sg.findPath(2, 7);
-        AlphaSchedule sc = new AlphaSchedule();
+        AlphaSchedule sc = new AlphaSchedule(1);
 
         Path p1 = null, p2 = null, p3 = null;
 
@@ -142,9 +142,9 @@ public class AlphaSheduleTest {
             p1 = new Path(path1);
             p2 = new Path(path2);
             p3 = new Path(path3);
-            sc.addTask(new Task(p1, 1, new Date()));
-            sc.addTask(new Task(p2, 2, new Date()));
-            sc.addTask(new Task(p3, 3, new Date()));
+            sc.addTask(new Task(p1, 1, new Date(), 1, 10, 1, 1));
+            sc.addTask(new Task(p2, 2, new Date(), 2, 10, 1, 1));
+            sc.addTask(new Task(p3, 3, new Date(), 3, 10, 1, 1));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             fail();
@@ -157,5 +157,6 @@ public class AlphaSheduleTest {
         }
 
         assertEquals("1 5 2 7 ", toTest, "string should be: 1 5 2 7 ");
+        assertEquals(6, sc.getLoadSinceLastTripToHeadQuarters(), "Should be 6 ");
     }
 }

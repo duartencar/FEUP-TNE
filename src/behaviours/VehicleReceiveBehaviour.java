@@ -30,7 +30,6 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
     protected ACLMessage handleCfp(ACLMessage cfp) {
         ACLMessage reply = null;
 
-        if(cfp != null) {
             try {
                 reply = cfp.createReply();
 
@@ -42,17 +41,10 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
                     return reply;
                 }
 
-                //System.out.println("Agent "+parent.getLocalName()+": CFP received from "+cfp.getSender().getLocalName() + ". Action is "+ requestToAnswer.toString());
-
-                if (parent.canHandleRequest(requestToAnswer.getNumBoxes())) {
-                    reply.setPerformative(ACLMessage.PROPOSE);
-                    final Proposal answer = parent.handleCallForProposal(requestToAnswer);
-                    reply.setContentObject(answer);
-                } else {
-                    reply.setPerformative(ACLMessage.REFUSE);
-                }
-
-                parent.log("Sent my proposal to " + requestToAnswer.getId());
+                reply.setPerformative(ACLMessage.PROPOSE);
+                final Proposal answer = parent.handleCallForProposal(requestToAnswer);
+                reply.setContentObject(answer);
+                parent.log("SENT: " + answer.toString());
 
                 return reply;
             }catch (UnreadableException e) {
@@ -66,12 +58,6 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
                 reply.setPerformative(ACLMessage.REFUSE);
                 return reply;
             }
-        }
-        else {
-            block();
-        }
-
-        return null;
     }
 
     protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
@@ -87,6 +73,7 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
 
         try {
             doneProposal = (Proposal)propose.getContentObject();
+
             if(parent.addAcceptedProposalToSchedule(doneProposal)) {
                 inform.setPerformative(ACLMessage.INFORM);
             }

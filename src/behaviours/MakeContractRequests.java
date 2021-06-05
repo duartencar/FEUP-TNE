@@ -25,11 +25,12 @@ public class MakeContractRequests extends TickerBehaviour {
         int i = 0;
         Cfp cfp = null;
 
-        for(Request r : p.getRequestsToPerform().values()){
+        for(Request r : p.getRequests()){
             if(i == p.currentRequest) {
                 cfp = r.getRequestCfp();
                 break;
             }
+            i++;
         }
 
         if(cfp != null) {
@@ -50,7 +51,7 @@ public class MakeContractRequests extends TickerBehaviour {
                 p.log("couldn't attach object to message");
             }
 
-            p.log("Starting CFP for: " + cfp.toString());
+            //p.log("Starting CFP for: " + cfp.toString());
 
             p.addBehaviour(new RequestBehaviour(p, msg, vehicles.size()));
 

@@ -11,9 +11,11 @@ import static utils.Utils.log;
 public class AlphaSchedule {
     // must be threadSafe
     Vector<Task> tasks;
+    int startPosition;
 
-    public AlphaSchedule() {
+    public AlphaSchedule(int startPosition) {
         tasks = new Vector<Task>();
+        this.startPosition = startPosition;
     }
 
     public short getTotalScheduleCost() {
@@ -26,12 +28,48 @@ public class AlphaSchedule {
         return sum;
     }
 
+    public int getLoadSinceLastTripToHeadQuarters() {
+        int load = 0;
+
+        if(tasks.isEmpty()) {
+            return 0;
+        }
+
+        for(int i = tasks.size() - 1; i >= 0; i--) {
+            if(tasks.get(i).getRequestId() == -1) {
+                break;
+            }
+
+            load += tasks.get(i).getLoad();
+        }
+
+        return load;
+    }
+
+    public float getConsumedFuelSinceLastTripToGasStation() {
+        float fuel = 0;
+
+        if(tasks.isEmpty()) {
+            return 0;
+        }
+
+        for(int i = tasks.size() - 1; i >= 0; i--) {
+            if(tasks.get(i).getRequestId() == -2) {
+                break;
+            }
+
+            fuel += tasks.get(i).getNecessaryFuel();
+        }
+
+        return fuel;
+    }
+
     public int numberOfTasks() {
         return tasks.size();
     }
 
     public int getLastTaskDestination() {
-        return tasks.size() == 0 ? -1 : tasks.get(tasks.size() - 1).getEnd().getId();
+        return tasks.size() == 0 ? startPosition : tasks.get(tasks.size() - 1).getEnd().getId();
     }
 
     public ArrayList<Integer> getFullPath() {
@@ -73,7 +111,7 @@ public class AlphaSchedule {
             tasks.add(task);
         }
         else {
-            for(int i = 1; i < tasks.size(); i++) {
+            for(int i = 0; i < tasks.size(); i++) {
                 Task t = tasks.get(i);
                 if(t.getStart().getId() == start.getId()) {
                     // replace with new task

@@ -43,6 +43,11 @@ public class RequestBehaviour extends ContractNetInitiator {
         nResponders--;
     }
 
+    protected void handleRefuse(ACLMessage refuse) {
+        System.out.println(refuse.getSender().getLocalName() + " refused to answer.");
+
+    }
+
 
     protected void handleAllResponses(Vector responses, Vector acceptances) {
 

@@ -34,6 +34,8 @@ public class DistributedLogistics {
 		createMainFrame();
 		createScrollableDisplay();
 		createCanvas();
+
+		mainFrame.setVisible(false);
 	}
 
 	public void update() {

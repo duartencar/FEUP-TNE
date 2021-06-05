@@ -30,8 +30,7 @@ public class RequestAgent extends Elementary {
     final private String agentName;
     final private int mode;
     final private char heuristic;
-    final private HashMap<Integer, Request> requests;
-    final private ArrayList<Request> requests_old;
+    final private ArrayList<Request> requests;
     public int currentRequest = 0;
 
     public RequestAgent(int id, String name, String randomRequests, String fileOrNumberOfRequests, char heuristic) throws Exception {
@@ -39,8 +38,7 @@ public class RequestAgent extends Elementary {
         this.heuristic = heuristic;
         agentName = name;
         mode = convertToInteger(randomRequests);
-        requests = new HashMap<Integer, Request>();
-        requests_old = new ArrayList<Request>();
+        requests = new ArrayList<Request>();
 
         switch (mode) {
             case FILE_MODE:
@@ -67,10 +65,6 @@ public class RequestAgent extends Elementary {
     }
 
     public ArrayList<Request> getRequests() {
-        return requests_old;
-    }
-
-    public HashMap<Integer, Request> getRequestsToPerform() {
         return requests;
     }
 
@@ -84,7 +78,7 @@ public class RequestAgent extends Elementary {
 
     protected void setup() {
         if(requests.size() > 0) {
-            addBehaviour(new MakeContractRequests(this, 500));
+            addBehaviour(new MakeContractRequests(this, 1000));
         }
         else {
             log("Didn't have requests.");
@@ -101,6 +95,12 @@ public class RequestAgent extends Elementary {
 
             if(request.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) request;
+
+                String requesterId = element.getAttribute("requesterId");
+
+                if(id != convertToInteger((requesterId))) {
+                    continue;
+                }
 
                 String numBoxes = element.getAttribute("numBoxes");
                 String destination = element.getAttribute("destination");
@@ -123,7 +123,7 @@ public class RequestAgent extends Elementary {
 
                     Request toAdd = generateRequest(i, numberOfBoxes,destinationNode,deliveryTime);
 
-                    requests.put(toAdd.getId(), toAdd);
+                    requests.add(toAdd);
 
                 } catch(NumberFormatException e) {
                     log("Couldn't parse one argument of the request in line " + (i + 1));
@@ -145,7 +145,7 @@ public class RequestAgent extends Elementary {
 
         for (int i = 0; i < numberOfRequestsToGenerate; i++) {
             Request newRequest = generateRequest(i,1 + generateInt(8), g.getRandomLocation(), "1200");
-            requests.put(newRequest.getId(), newRequest);
+            requests.add(newRequest);
         }
     }
 

@@ -37,12 +37,14 @@ public class Vehicle extends Elementary {
     private float fuelConsumed = 0;
     private float fuelExpenses = 0;
     private float profit;
-    private TreeSet<Integer> utilityNodes;
+    private TreeSet<Integer> gasStations;
+    private int hq;
     private ArrayList<Request> requests;
     private DijkstraGraph searchGraph;
     private AlphaSchedule schedule;
     private DistributedLogistics gui;
     private ConcurrentHashMap<Integer, Proposal> proposals;
+    private ConcurrentHashMap<Integer, Cfp> calls;
     public Color agentColor;
     private long simulationStartTime;
 
@@ -55,22 +57,31 @@ public class Vehicle extends Elementary {
         profit = 0;
         currentLoad = 0;
         requests = new ArrayList<Request>();
-        schedule = new AlphaSchedule();
+        schedule = new AlphaSchedule(sp.getId());
         agentColor = new Color(generateFloat(), generateFloat(), generateFloat());
         searchGraph = Graph.getInstance().getGraphToSearch();
-        utilityNodes = new TreeSet<Integer>();
+        gasStations = new TreeSet<Integer>();
         proposals = new ConcurrentHashMap<Integer, Proposal>();
         simulationStartTime = Calendar.getInstance().getTimeInMillis();
+        calls = new ConcurrentHashMap<Integer, Cfp>();
+
+        if(startPosition.getId() != hq) {
+            goToHeadQuarters();
+        }
     }
 
     public DistributedLogistics getGui() {
         return gui;
     }
 
-    public void setUtilityNodes(ArrayList<Integer> ids) {
+    public void setGasStations(ArrayList<Integer> ids) {
         for(Integer id: ids) {
-            utilityNodes.add(id);
+            gasStations.add(id);
         }
+    }
+
+    public void setHq(int hq) {
+        this.hq = hq;
     }
 
     public void setColor(Color c) {
@@ -142,53 +153,117 @@ public class Vehicle extends Elementary {
         return requests;
     }
 
-    public synchronized ArrayList<Integer> getPathTo(int destination) {
-        ArrayList<Integer> path = schedule.numberOfTasks() == 0 ?
-                searchGraph.findPath(startPosition.getId(), destination) :
-                searchGraph.getMinimumPathFromSchedule(destination, schedule, utilityNodes);
+    public void getGas() {
+        int lastTaskDestination = schedule.getLastTaskDestination();
+        ArrayList<Integer> path = Graph.getInstance().getGraphToSearch().getPathToNearestGasStation(lastTaskDestination);
 
-        return path;
     }
 
-    public synchronized boolean addAcceptedProposalToSchedule(Proposal p) {
+    public void goToHeadQuarters() {
+        int lastTaskDestination = schedule.getLastTaskDestination();
+        ArrayList<Integer> path = Graph.getInstance().getGraphToSearch().findPathToHq(lastTaskDestination);
 
         try {
-            Task t = new Task(new Path(p.getProposedPath()), p.getCfpId(), new Date(simulationStartTime + (p.getMinutes() * 60 * 1000)));
+            Path p = new Path(path);
+            int[] deliveryCosts = Graph.getInstance().getPathCosts(path);
+
+            int deliveryMinutes = deliveryCosts[0];
+            float deliveryDistance = deliveryCosts[1] / 100.0f; // divide pixel distance for 100 to get distance in km
+            float deliveryConsumption = consumption(deliveryDistance);
+            float deliveryBudget = budget(deliveryConsumption);
+            Task t = new Task(p, -1, new Date(simulationStartTime + (p.getWeight() * 60 * 1000)), 0, deliveryDistance, deliveryConsumption, deliveryBudget);
             schedule.addTask(t);
+        } catch (Exception e) {
+            log("Couldn't create task.");
+        }
+    }
+
+    public boolean addAcceptedProposalToSchedule(Proposal p) {
+
+        Task delivery = null, gas = null;
+
+        if(p.getProposedPath().size() == 0) {
+            log("Path with no steps");
+            return false;
+        }
+
+        ArrayList<Integer> hqPath = new ArrayList<Integer>();
+        ArrayList<Integer> deliveryPath = new ArrayList<Integer>();
+        boolean goesToHq = false, previous;
+
+        for(Integer id : p.getProposedPath()) {
+            previous = goesToHq;
+
+            if(gasStations.contains(id)) {
+                goesToHq = true;
+            }
+            if(!previous) {
+                hqPath.add(id);
+            }
+            if(goesToHq) {
+                deliveryPath.add(id);
+            }
+        }
+
+        // if stop for gas is false, delivery is p.getProposedPath()
+
+        int[] deliveryCosts = goesToHq ? Graph.getInstance().getPathCosts(deliveryPath) : Graph.getInstance().getPathCosts(p.getProposedPath());
+        int[] tripToHqCosts = goesToHq ? Graph.getInstance().getPathCosts(hqPath) : null;
+
+        int deliveryMinutes = deliveryCosts[0];
+        float deliveryDistance = deliveryCosts[1] / 100.0f; // divide pixel distance for 100 to get distance in km
+        float deliveryConsumption = consumption(deliveryDistance);
+        float deliveryBudget = budget(deliveryConsumption);
+
+        int hqMinutes = goesToHq ? tripToHqCosts[0] : 0;
+        int hqDistance = goesToHq ? tripToHqCosts[1] : 0;
+        float hqConsumption = goesToHq ? consumption(hqDistance) : 0;
+        float hqBudget = goesToHq ? budget(hqConsumption) : 0;
+
+        //log("\ntrying to add " + p.getProposedPath().get(0) + " -> " + p.getProposedPath().get(p.getProposedPath().size() - 1));
+
+        try {
+            Path pathToDelivery = new Path(goesToHq ? deliveryPath : p.getProposedPath());
+            Path pathToHq = goesToHq ? new Path(hqPath) : null;
+            delivery = new Task(pathToDelivery,
+                                p.getCfpId(),
+                                new Date(simulationStartTime + (deliveryMinutes * 60 * 1000)),
+                                calls.get(p.getCfpId()).getNumBoxes(),
+                                deliveryDistance,
+                                deliveryConsumption,
+                                deliveryBudget);
+
+            gas = goesToHq ? new Task(pathToHq,
+                            p.getCfpId(),
+                            new Date(simulationStartTime + (hqMinutes * 60 * 1000)),
+                            0,
+                            hqDistance,
+                            hqConsumption,
+                            hqBudget) : null;
+
+            if(goesToHq) {
+                schedule.addTask(gas);
+            }
+            schedule.addTask(delivery);
         } catch (Exception e) {
             log("Couldn't create task.");
             return false;
         }
 
-        currentLoad += p.getLoadIfAccepts();
+        //log("Schedule after " + schedule.toString());
+
+        currentLoad += calls.get(p.getCfpId()).getNumBoxes();
         distanceCovered += p.getTotalDistance();
         fuelConsumed += p.getConsumption();
         fuelExpenses += p.getPrice();
 
-        return true;
-    }
+        if(maxCapacity - schedule.getLoadSinceLastTripToHeadQuarters() < 6) {
+            goToHeadQuarters();
+        }
 
-    public boolean addRequest(Request newRequest) {
-        if (currentLoad + newRequest.getNumBoxes() > maxCapacity) {
-            //TODO: check if new request exceeds gas tank by checking consumption (requires the pathfinding algorithm)
-            return false;
-        }
-        int i = 0;
-        for (Request r : requests) {
-            if (newRequest.getDeliveryTime() < r.getDeliveryTime())
-                break;
-            i++;
-        }
-        requests.add(i,newRequest);
-        currentLoad += newRequest.getNumBoxes();
-        return true;
-    }
+        //log("My load is " + currentLoad + " and my total space is " + maxCapacity);
 
-    public void removeRequest(int index) {
-        if (index < requests.size()) {
-            currentLoad -= requests.get(index).getNumBoxes();
-            requests.remove(index);
-        }
+        return true;
     }
 
     public float consumption(float distance) {
@@ -223,101 +298,82 @@ public class Vehicle extends Elementary {
         return consumption * pricePerEnergy;
     }
 
-    public boolean canHandleRequest(int numBoxes) {
-        //TODO: check if enough gas
-        return (currentLoad+numBoxes <= maxCapacity);
+    public ArrayList<Integer> getPathTo(int destination) {
+
+        ArrayList<Integer> path = schedule.numberOfTasks() == 0 ?
+                Graph.getInstance().getGraphToSearch().findPath(startPosition.getId(), destination) :
+                Graph.getInstance().getGraphToSearch().getMinimumPathFromSchedule(destination, schedule);
+
+        return path;
     }
 
-    public synchronized Proposal handleCallForProposal(Cfp cfp) {
+    public ArrayList<Integer> mergePaths(ArrayList<Integer> pathToHq, ArrayList<Integer> pathToDelivery) {
+        ArrayList<Integer> finalPath = new ArrayList<Integer>(pathToHq.size() + pathToDelivery.size() - 1);
+
+        for(Integer id : pathToHq) {
+            finalPath.add(id);
+        }
+
+        for(int i = 1; i < pathToDelivery.size(); i++) {
+            finalPath.add(pathToDelivery.get(i));
+        }
+
+        return finalPath;
+    }
+
+    public Proposal handleCallForProposal(Cfp cfp) {
         //TODO: use a pathfinding algorithm to see how long it would take for it to distribute the request
         /*
         distance traveled: 25
         loadIfAccepts: 85%
 	    costIfAccepts: 8€
          */
-        ArrayList<Integer> bestPath = getPathTo(cfp.getDestination());
+        DijkstraGraph g = Graph.getInstance().getGraphToSearch();
+        ArrayList<Integer> pathToDelivery, pathToGasStation, pathToHeadQuarters = null;
+        float remainingFuel = tankSize - schedule.getConsumedFuelSinceLastTripToGasStation();
+        int remainingSpace = (int)maxCapacity - schedule.getLoadSinceLastTripToHeadQuarters();
+        int headQuartersId = -1;
 
-        int load = (int) ((currentLoad + cfp.getNumBoxes()) * 100 / maxCapacity);
+        if(remainingSpace < cfp.getNumBoxes()) {
+            int lastTaskDestination = schedule.getLastTaskDestination();
+            pathToHeadQuarters = g.findPathToHq(lastTaskDestination);
+            log("I have to go to HQ to make delivery " + cfp.getId());
+        }
 
-        int[] costs = Graph.getInstance().getPathCosts(bestPath);
+        headQuartersId = pathToHeadQuarters != null ? pathToHeadQuarters.get(pathToHeadQuarters.size() - 1) : -1;
 
-        int minutes = costs[0];
-        float distance = costs[1] / 100.0f; // divide pixel distance for 100 to get distance in km
-        float consumption = consumption(distance);
-        float budget = budget(consumption);
+        pathToDelivery = pathToHeadQuarters != null ? g.findPath(headQuartersId, cfp.getDestination()) : getPathTo(cfp.getDestination());
+
+        int load = pathToHeadQuarters != null ? (int)(cfp.getNumBoxes() * 100 / maxCapacity) : (int) ((schedule.getLoadSinceLastTripToHeadQuarters() + cfp.getNumBoxes()) * 100 / maxCapacity);
+
+        log("received call for " + cfp.getNumBoxes() + " my current load is " + schedule.getLoadSinceLastTripToHeadQuarters() + " and my capacity is " + maxCapacity);
+
+        int[] deliveryCosts = Graph.getInstance().getPathCosts(pathToDelivery);
+        int[] tripToHqCosts = pathToHeadQuarters != null ? Graph.getInstance().getPathCosts(pathToHeadQuarters) : null;
+
+        int deliveryMinutes = deliveryCosts[0];
+        float deliveryDistance = deliveryCosts[1] / 100.0f; // divide pixel distance for 100 to get distance in km
+
+        float deliveryConsumption = consumption(deliveryDistance);
+        float deliveryBudget = budget(deliveryConsumption);
+        int hqMinutes = pathToHeadQuarters != null ? tripToHqCosts[0] : 0;
+        int hqDistance = pathToHeadQuarters != null ? tripToHqCosts[1] : 0;
+        float hqConsumption = pathToHeadQuarters != null ? consumption(hqDistance) : 0;
+        float hqBudget = pathToHeadQuarters != null ? budget(hqConsumption) : 0;
 
         Proposal toPropose = new Proposal(
                                             cfp.getId(),
                                             cfp.getParentId(),
                                             getAID(),
-                                            bestPath,
+                                            pathToHeadQuarters != null ? mergePaths(pathToHeadQuarters, pathToDelivery) : pathToDelivery,
                                             load,
-                                            minutes,
-                                            distance,
-                                            consumption,
-                                            budget);
+                                            pathToHeadQuarters != null ? hqMinutes + deliveryMinutes : deliveryMinutes,
+                                            pathToHeadQuarters != null ? hqDistance + deliveryDistance : deliveryDistance,
+                                            pathToHeadQuarters != null ? hqConsumption + deliveryConsumption : deliveryConsumption,
+                                            pathToHeadQuarters != null ? hqBudget + deliveryBudget : deliveryBudget);
 
         proposals.put(cfp.getId(), toPropose);
-
-        //log(toPropose.toString());
-
-        /*ArrayList<Request> auxRequests = new ArrayList<>();
-        ArrayList<GraphNode> path = new ArrayList<>();
-        GraphNode before = null, after = null;
-        if (pathChoosing.contains("time")) {
-            for (Request req : requests) {
-                if (req.getDeliveryTime() < time) {
-                    auxRequests.add(req);
-                    path.add(req.getDestination());
-                    before = req.getDestination();
-                } else {
-                    after = req.getDestination();
-                    break;
-                }
-            }
-        } else if (pathChoosing.contains("path")) {
-            int min = 99999999;
-            int pos = requests.size();
-            for (Request req : requests) {
-                //TODO: append here
-                before = req.getDestination();
-                after = req.getDestination();
-            }
-        }
-
-        //TODO: calculate detour cost
-        int prev = -1, curr = -1, next = -1;
-        for (Map.Entry node : Graph.getInstance().nodes.entrySet()) {
-            if (node.getValue().equals(destinationNode)) {
-                curr = (int) node.getKey();
-                break;
-            }
-        }
-        if (before != null) {
-            for (Map.Entry node : Graph.getInstance().nodes.entrySet()) {
-                if (node.getValue().equals(before)) {
-                    prev = (int) node.getKey();
-                    break;
-                }
-            }
-        }
-        if (after != null) {
-            for (Map.Entry node : Graph.getInstance().nodes.entrySet()) {
-                if (node.getValue().equals(after)) {
-                    next = (int) node.getKey();
-                    break;
-                }
-            }
-        }
-        int cost = 0;
-        if (prev != -1) {
-            ArrayList<Integer> p = map.findPath(prev, curr);
-            cost += p.size(); //TODO: use road weights, and not length of path
-        }
-        if (next != -1) {
-            ArrayList<Integer> p = map.findPath(curr, next);
-            cost += p.size();
-        }*/
+        calls.put(cfp.getId(), cfp);
 
         return toPropose;
     }

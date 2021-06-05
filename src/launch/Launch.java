@@ -222,7 +222,8 @@ public class Launch extends Boot {
 
     private static void addGuiReferenceAndSetUtilityNodes(DistributedLogistics g) {
         for(Vehicle v: vehicleAgents) {
-            v.setUtilityNodes(Graph.getInstance().getUtilityNodes());
+            v.setGasStations(Graph.getInstance().getGasStations());
+            v.setHq(Graph.getInstance().getHeadQuarter());
             v.setGui(g);
         }
     }
