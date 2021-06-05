@@ -4,6 +4,7 @@ import map.Graph;
 import map.GraphNode;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 
 import static utils.Utils.log;
@@ -12,10 +13,12 @@ public class AlphaSchedule {
     // must be threadSafe
     Vector<Task> tasks;
     int startPosition;
+    Date scheduleStart;
 
-    public AlphaSchedule(int startPosition) {
+    public AlphaSchedule(int startPosition, Date start) {
         tasks = new Vector<Task>();
         this.startPosition = startPosition;
+        scheduleStart = start;
     }
 
     public Task getLastTask() {

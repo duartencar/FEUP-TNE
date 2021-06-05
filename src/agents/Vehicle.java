@@ -57,12 +57,12 @@ public class Vehicle extends Elementary {
         profit = 0;
         currentLoad = 0;
         requests = new ArrayList<Request>();
-        schedule = new AlphaSchedule(sp.getId());
         agentColor = new Color(generateFloat(), generateFloat(), generateFloat());
         searchGraph = Graph.getInstance().getGraphToSearch();
         gasStations = new TreeSet<Integer>();
         proposals = new ConcurrentHashMap<Integer, Proposal>();
         simulationStartTime = Calendar.getInstance().getTimeInMillis();
+        schedule = new AlphaSchedule(sp.getId(), new Date(simulationStartTime));
         calls = new ConcurrentHashMap<Integer, Cfp>();
 
         if(startPosition.getId() != hq) {
@@ -148,7 +148,6 @@ public class Vehicle extends Elementary {
     public void getGas() {
         int lastTaskDestination = schedule.getLastTaskDestination();
         ArrayList<Integer> path = Graph.getInstance().getGraphToSearch().getPathToNearestGasStation(lastTaskDestination);
-
     }
 
     public void goToHeadQuarters() {
@@ -260,18 +259,22 @@ public class Vehicle extends Elementary {
 
     public float consumption(float distance) {
         float consumptionRatio = 0;
+        float consumptionIncreaseWithWeight = 0;
 
         if(type.equals(ELECTRIC_TYPE)) {
             consumptionRatio = ELECTRIC_CONSUMPTION;
+            consumptionIncreaseWithWeight = ELECTRIC_CONSUMPTION_INCREASE_WITH_WEIGHT;
         }
         else if(type.equals(GAS_TYPE)) {
             consumptionRatio = GAS_CONSUMPTION;
+            consumptionIncreaseWithWeight = GAS_CONSUMPTION_INCREASE_WITH_WEIGHT;
         }
         else if(type.equals(DIESEL_TYPE)) {
             consumptionRatio = DIESEL_CONSUMPTION;
+            consumptionIncreaseWithWeight = DIESEL_CONSUMPTION_INCREASE_WITH_WEIGHT;
         }
 
-        return distance * consumptionRatio / 100f;
+        return distance * (consumptionRatio + schedule.getLoadSinceLastTripToHeadQuarters() / maxCapacity * consumptionIncreaseWithWeight) / 100f;
     }
 
     public float budget(float consumption) {
@@ -294,7 +297,7 @@ public class Vehicle extends Elementary {
 
         ArrayList<Integer> path = schedule.numberOfTasks() == 0 ?
                 Graph.getInstance().getGraphToSearch().findPath(startPosition.getId(), destination) :
-                Graph.getInstance().getGraphToSearch().getMinimumPathFromSchedule(destination, schedule);
+                Graph.getInstance().getGraphToSearch().findPath(schedule.getLastTaskDestination(), destination);
 
         return path;
     }
@@ -395,9 +398,10 @@ public class Vehicle extends Elementary {
         g.drawString("Name: " + name, x + 10, y + 30);
         g.drawString(schedule.toString(), x + 10, y + 50);
         g.drawString("Boxes: " + schedule.getTotalBoxesCarried(), x + 10, y + 70);
-        g.drawString("Fuel: " + df.format(schedule.getTotalFuelConsumed()), x + 100, y + 70);
-        g.drawString("km: " + df.format(schedule.getTotalDistance()), x + 190, y + 70);
-        g.drawString("€: " + df.format(schedule.getTotalExpense()), x + 280, y + 70);
+        g.drawString("Fuel: " + df.format(schedule.getTotalFuelConsumed()), x + 70, y + 70);
+        g.drawString("km: " + df.format(schedule.getTotalDistance()), x + 160, y + 70);
+        g.drawString(df.format(schedule.getTotalExpense()) + " €", x + 250, y + 70);
+        g.drawString(df.format(schedule.getTotalScheduleDuration()) + " min", x + 300, y + 70);
         g.setColor(agentColor);
         g.fillRect(width - 20, y, 20, 20);
     }

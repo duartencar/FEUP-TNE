@@ -31,7 +31,7 @@ public class AlphaScheduleTest {
     public void testCreate() {
         getGraph();
 
-        AlphaSchedule toTest = new AlphaSchedule(1);
+        AlphaSchedule toTest = new AlphaSchedule(1, new Date());
 
         assertEquals("Empty", toTest.toString(), "Path should be: Empty");
         assertEquals((short)0, toTest.getTotalScheduleDuration(), "Total cost should be 0");
@@ -44,7 +44,7 @@ public class AlphaScheduleTest {
 
         ArrayList<Integer> path = toTest.findPath(1, 5);
 
-        AlphaSchedule sc = new AlphaSchedule(1);
+        AlphaSchedule sc = new AlphaSchedule(1, new Date());
 
         Path p = null;
 
@@ -67,7 +67,7 @@ public class AlphaScheduleTest {
         ArrayList<Integer> path1 = sg.findPath(1, 5);
         ArrayList<Integer> path2 = sg.findPath(5, 2);
         ArrayList<Integer> path3 = sg.findPath(2, 7);
-        AlphaSchedule sc = new AlphaSchedule(1);
+        AlphaSchedule sc = new AlphaSchedule(1, new Date());
 
         Path p1 = null, p2 = null, p3 = null;
 
@@ -95,7 +95,7 @@ public class AlphaScheduleTest {
         ArrayList<Integer> path2 = sg.findPath(5, 2);
         ArrayList<Integer> aux = sg.findPath(2, 7);
         ArrayList<Integer> path3 = sg.findPath(5, 7);
-        AlphaSchedule sc = new AlphaSchedule(1);
+        AlphaSchedule sc = new AlphaSchedule(1, new Date());
 
         Path p1 = null, p2 = null, p3 = null, auxPath = null;
 
@@ -134,7 +134,7 @@ public class AlphaScheduleTest {
         ArrayList<Integer> path1 = sg.findPath(1, 5);
         ArrayList<Integer> path2 = sg.findPath(5, 2);
         ArrayList<Integer> path3 = sg.findPath(2, 7);
-        AlphaSchedule sc = new AlphaSchedule(1);
+        AlphaSchedule sc = new AlphaSchedule(1, new Date());
 
         Path p1 = null, p2 = null, p3 = null;
 

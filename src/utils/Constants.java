@@ -31,14 +31,17 @@ public final class Constants {
             public final class VehicleProperties {
                 public static final String ELECTRIC_TYPE = "electric";
                 public static final float ELECTRIC_CONSUMPTION = 18f; // 18 kW/100km
+                public static final float ELECTRIC_CONSUMPTION_INCREASE_WITH_WEIGHT = 25f; // 0.16 €/kW
                 public static final float ELECTRIC_COST = 0.16f; // 0.16 €/kW
 
                 public static final String GAS_TYPE = "gas";
                 public static final float GAS_CONSUMPTION = 8f; // 8 L/100km
+                public static final float GAS_CONSUMPTION_INCREASE_WITH_WEIGHT = 4f;
                 public static final float GAS_COST = 1.7f; // 1.7 €/L
 
                 public static final String DIESEL_TYPE = "diesel";
                 public static final float DIESEL_CONSUMPTION = 6.5f; // 6.5 L/100km
+                public static final float DIESEL_CONSUMPTION_INCREASE_WITH_WEIGHT = 2.5f;
                 public static final float DIESEL_COST = 1.45f; // 1.45 €/L
             }
         }

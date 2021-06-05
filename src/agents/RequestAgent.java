@@ -166,6 +166,14 @@ public class RequestAgent extends Elementary {
         return p.getPrice();
     }
 
+    float absoluteLessTime(Proposal p) {
+        return p.getMinutes();
+    }
+
+    float speed(Proposal p) {
+        return p.getMinutes() / p.getTotalDistance();
+    }
+
     public float evaluateProposal(Proposal p) {
         float evaluation = Float.MAX_VALUE;
 
@@ -175,6 +183,12 @@ public class RequestAgent extends Elementary {
                 break;
             case 'C':
                 evaluation = absoluteCost(p);
+                break;
+            case 'T':
+                evaluation = absoluteLessTime(p);
+                break;
+            case 'S':
+                evaluation = speed(p);
                 break;
             default:
                 evaluation = absoluteDistanceHeuristic(p);

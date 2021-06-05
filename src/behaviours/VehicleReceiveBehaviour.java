@@ -76,37 +76,17 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
 
             if(parent.addAcceptedProposalToSchedule(doneProposal)) {
                 inform.setPerformative(ACLMessage.INFORM);
+                parent.log("Accepted new proposal, my shcedule now is: " + parent.getSchedule().toString());
             }
             else {
-                inform.setPerformative(ACLMessage.INFORM);
+                inform.setPerformative(ACLMessage.FAILURE);
+                parent.log("Couldn't add task");
             }
         } catch (UnreadableException unreadableException) {
             parent.log("Failed to get proposal from object: " + unreadableException.getMessage());
             throw new FailureException(unreadableException.getMessage());
         }
 
-        parent.log("Accepted new proposal, my shcedule now is: " + parent.getSchedule().toString());
-
-
-        //TODO: check if no new better offer
-        /*if (true) {
-            //Request(String id, String parentId, int numBoxes, GraphNode destination, int deliveryTime)
-            //prop.request.getId() + "-" + prop.request.getDeliveryTime() + "-" + prop.request.getDestination() + "-" + prop.request.getNumBoxes() + "-" + this.parent.getName()
-            String[] content = cfp.getContent().split("-");
-            GraphNode node = null;
-            Graph g = Graph.getInstance();
-            for (Map.Entry n: g.nodes.entrySet()) {
-                if (n.getValue().toString().equals(content[2])) {
-                    node = ((GraphNode) n.getValue());
-                    break;
-                }
-            }
-            Request req = new Request(convertToInteger(content[0]), convertToInteger(content[4]),Integer.parseInt(content[3]), node, Integer.parseInt(content[1]));
-            this.parent.addRequest(req);
-            reply.setPerformative(ACLMessage.INFORM);
-        }
-        else
-            reply.setPerformative(ACLMessage.FAILURE);*/
         return inform;
     }
 }
