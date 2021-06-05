@@ -12,6 +12,7 @@ import map.GraphNode;
 import map.search.DijkstraGraph;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,7 +43,6 @@ public class Vehicle extends Elementary {
     private ArrayList<Request> requests;
     private DijkstraGraph searchGraph;
     private AlphaSchedule schedule;
-    private DistributedLogistics gui;
     private ConcurrentHashMap<Integer, Proposal> proposals;
     private ConcurrentHashMap<Integer, Cfp> calls;
     public Color agentColor;
@@ -70,10 +70,6 @@ public class Vehicle extends Elementary {
         }
     }
 
-    public DistributedLogistics getGui() {
-        return gui;
-    }
-
     public void setGasStations(ArrayList<Integer> ids) {
         for(Integer id: ids) {
             gasStations.add(id);
@@ -94,10 +90,6 @@ public class Vehicle extends Elementary {
 
     public AlphaSchedule getSchedule() {
         return schedule;
-    }
-
-    public void setGui(DistributedLogistics gui) {
-        this.gui = gui;
     }
 
     public void setup() {
@@ -216,7 +208,7 @@ public class Vehicle extends Elementary {
         float deliveryBudget = budget(deliveryConsumption);
 
         int hqMinutes = goesToHq ? tripToHqCosts[0] : 0;
-        int hqDistance = goesToHq ? tripToHqCosts[1] : 0;
+        float hqDistance = goesToHq ? tripToHqCosts[1] / 100.0f : 0;
         float hqConsumption = goesToHq ? consumption(hqDistance) : 0;
         float hqBudget = goesToHq ? budget(hqConsumption) : 0;
 
@@ -346,20 +338,36 @@ public class Vehicle extends Elementary {
 
         int load = pathToHeadQuarters != null ? (int)(cfp.getNumBoxes() * 100 / maxCapacity) : (int) ((schedule.getLoadSinceLastTripToHeadQuarters() + cfp.getNumBoxes()) * 100 / maxCapacity);
 
-        log("received call for " + cfp.getNumBoxes() + " my current load is " + schedule.getLoadSinceLastTripToHeadQuarters() + " and my capacity is " + maxCapacity);
+        // log("received call for " + cfp.getNumBoxes() + " my current load is " + schedule.getLoadSinceLastTripToHeadQuarters() + " and my capacity is " + maxCapacity);
 
         int[] deliveryCosts = Graph.getInstance().getPathCosts(pathToDelivery);
-        int[] tripToHqCosts = pathToHeadQuarters != null ? Graph.getInstance().getPathCosts(pathToHeadQuarters) : null;
-
         int deliveryMinutes = deliveryCosts[0];
         float deliveryDistance = deliveryCosts[1] / 100.0f; // divide pixel distance for 100 to get distance in km
-
         float deliveryConsumption = consumption(deliveryDistance);
         float deliveryBudget = budget(deliveryConsumption);
-        int hqMinutes = pathToHeadQuarters != null ? tripToHqCosts[0] : 0;
-        int hqDistance = pathToHeadQuarters != null ? tripToHqCosts[1] : 0;
-        float hqConsumption = pathToHeadQuarters != null ? consumption(hqDistance) : 0;
-        float hqBudget = pathToHeadQuarters != null ? budget(hqConsumption) : 0;
+
+        int[] tripToHqCosts = null;
+        int hqMinutes = 0;
+        float hqDistance = 0;
+        float hqConsumption = 0;
+        float hqBudget = 0;
+
+        if(pathToHeadQuarters != null) {
+            tripToHqCosts = Graph.getInstance().getPathCosts(pathToHeadQuarters);
+            hqMinutes = tripToHqCosts[0];
+            hqDistance = tripToHqCosts[1] / 100.0f;
+            hqConsumption = consumption(hqDistance);
+            hqBudget = budget(hqConsumption);
+            log("added path to headquarters");
+        }
+        else if(schedule.getLastTaskDestination() == hq) {
+            hqMinutes = schedule.getLastTask().getMinutes();
+            hqDistance = schedule.getLastTask().getDistanceToComplete();
+            hqConsumption = schedule.getLastTask().getNecessaryFuel();
+            hqBudget = schedule.getLastTask().getExpense();
+            log("added previous trip to HQ");
+        }
+
 
         Proposal toPropose = new Proposal(
                                             cfp.getId(),
@@ -367,10 +375,10 @@ public class Vehicle extends Elementary {
                                             getAID(),
                                             pathToHeadQuarters != null ? mergePaths(pathToHeadQuarters, pathToDelivery) : pathToDelivery,
                                             load,
-                                            pathToHeadQuarters != null ? hqMinutes + deliveryMinutes : deliveryMinutes,
-                                            pathToHeadQuarters != null ? hqDistance + deliveryDistance : deliveryDistance,
-                                            pathToHeadQuarters != null ? hqConsumption + deliveryConsumption : deliveryConsumption,
-                                            pathToHeadQuarters != null ? hqBudget + deliveryBudget : deliveryBudget);
+                                            hqMinutes + deliveryMinutes,
+                                            hqDistance + deliveryDistance,
+                                            hqConsumption + deliveryConsumption,
+                                            hqBudget + deliveryBudget);
 
         proposals.put(cfp.getId(), toPropose);
         calls.put(cfp.getId(), cfp);
@@ -379,11 +387,17 @@ public class Vehicle extends Elementary {
     }
 
     public void paint(Graphics g, int x, int y, int width, int height) {
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
         g.setColor(new Color(255, 255, 255));
         g.fillRect(x, y, width, height);
         g.setColor(new Color(0, 0, 0));
-        g.drawString("Nome: " + name, x + 10, y + 30);
+        g.drawString("Name: " + name, x + 10, y + 30);
         g.drawString(schedule.toString(), x + 10, y + 50);
+        g.drawString("Boxes: " + schedule.getTotalBoxesCarried(), x + 10, y + 70);
+        g.drawString("Fuel: " + df.format(schedule.getTotalFuelConsumed()), x + 100, y + 70);
+        g.drawString("km: " + df.format(schedule.getTotalDistance()), x + 190, y + 70);
+        g.drawString("€: " + df.format(schedule.getTotalExpense()), x + 280, y + 70);
         g.setColor(agentColor);
         g.fillRect(width - 20, y, 20, 20);
     }

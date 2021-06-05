@@ -148,10 +148,12 @@ public class DijkstraGraph {
             aux.setVisited();
         }
 
-        while(aux.getPrevious() != null) {
+         do {
             answer.add(aux.getId());
             aux = aux.getPrevious();
-        }
+         } while(aux.getPrevious() != null);
+
+        answer.add(aux.getId());
 
         return answer;
     }

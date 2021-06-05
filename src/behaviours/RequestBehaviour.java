@@ -3,25 +3,19 @@ package behaviours;
 import agents.RequestAgent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetInitiator;
 import logic.Proposal;
 
-import java.io.IOException;
 import java.util.*;
 
 public class RequestBehaviour extends ContractNetInitiator {
     private int nResponders;
-    private MessageTemplate mt;
-    private int step = 0;
-    private RequestAgent parent;
-    private Map<String,Proposal> proposals;
+    final private RequestAgent parent;
 
     public RequestBehaviour(RequestAgent p, ACLMessage msg, int numberOfResponders) {
         super(p, msg);
         this.parent = p;
-        proposals = new HashMap<>();
         nResponders = numberOfResponders;
     }
 /*
@@ -72,7 +66,7 @@ public class RequestBehaviour extends ContractNetInitiator {
                 reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
                 acceptances.addElement(reply);
 
-                Proposal content = null;
+                Proposal content;
                 try {
                     content = (Proposal)msg.getContentObject();
                 } catch (UnreadableException unreadableException) {
@@ -98,6 +92,8 @@ public class RequestBehaviour extends ContractNetInitiator {
 
     protected void handleInform(ACLMessage inform) {
         parent.log("Agent scheduled task.");
+        // parent.getGui().addNewRequest(bestProposal.getProposedPath().get(bestProposal.getProposedPath().size() - 1));
+        parent.getGui().update();
     }
 
     /*protected void handlePropose(ACLMessage propose) {

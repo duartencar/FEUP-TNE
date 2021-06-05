@@ -34,7 +34,7 @@ public class AlphaScheduleTest {
         AlphaSchedule toTest = new AlphaSchedule(1);
 
         assertEquals("Empty", toTest.toString(), "Path should be: Empty");
-        assertEquals((short)0, toTest.getTotalScheduleCost(), "Total cost should be 0");
+        assertEquals((short)0, toTest.getTotalScheduleDuration(), "Total cost should be 0");
         assertEquals(0, toTest.numberOfTasks(), "Number of tasks should be 0");
     }
 
@@ -57,7 +57,7 @@ public class AlphaScheduleTest {
         }
 
         assertEquals("1 -> 5", sc.toString(), "Path should be: 1 -> 5");
-        assertEquals(p.getWeight(), sc.getTotalScheduleCost(), "Cost should be the same as path");
+        assertEquals(p.getWeight(), sc.getTotalScheduleDuration(), "Cost should be the same as path");
         assertEquals(1, sc.numberOfTasks(), "Number of tasks should be 1");
     }
 
@@ -84,7 +84,7 @@ public class AlphaScheduleTest {
         }
 
         assertEquals("1 -> 5 -> 2 -> 7", sc.toString(), "Path should be: 1 -> 5 -> 2 -> 7");
-        assertEquals(p1.getWeight() + p2.getWeight() + p3.getWeight(), sc.getTotalScheduleCost(), "Cost should be the same as path");
+        assertEquals(p1.getWeight() + p2.getWeight() + p3.getWeight(), sc.getTotalScheduleDuration(), "Cost should be the same as path");
         assertEquals(3, sc.numberOfTasks(), "Number of tasks should be 3");
     }
 
@@ -110,7 +110,7 @@ public class AlphaScheduleTest {
         }
 
         assertEquals("1 -> 5 -> 7", sc.toString(), "Path should be: 1 -> 5");
-        assertEquals(p1.getWeight() + p3.getWeight(), sc.getTotalScheduleCost(), "Cost should be the same as path");
+        assertEquals(p1.getWeight() + p3.getWeight(), sc.getTotalScheduleDuration(), "Cost should be the same as path");
         assertEquals(2, sc.numberOfTasks(), "Number of tasks should be 3");
 
         try {
@@ -123,8 +123,8 @@ public class AlphaScheduleTest {
         }
 
         assertEquals("1 -> 5 -> 2 -> 7", sc.toString(), "Path should be: 1 -> 5 -> 2 -> 7");
-        assertNotEquals(p1.getWeight() + p2.getWeight() + p3.getWeight(), sc.getTotalScheduleCost(), "Cost shouldn't be the same as the sum of previous paths");
-        assertEquals(p1.getWeight() + p2.getWeight() + auxPath.getWeight(), sc.getTotalScheduleCost(), "Cost should be the same as the sum of previous paths from previous test");
+        assertNotEquals(p1.getWeight() + p2.getWeight() + p3.getWeight(), sc.getTotalScheduleDuration(), "Cost shouldn't be the same as the sum of previous paths");
+        assertEquals(p1.getWeight() + p2.getWeight() + auxPath.getWeight(), sc.getTotalScheduleDuration(), "Cost should be the same as the sum of previous paths from previous test");
         assertEquals(3, sc.numberOfTasks(), "Number of tasks should be 3");
     }
 

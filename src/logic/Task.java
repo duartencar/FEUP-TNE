@@ -66,10 +66,6 @@ public class Task {
         pathToTarget = p;
     }
 
-    public short getCost() {
-        return pathToTarget.getWeight();
-    }
-
     public GraphNode getEnd() {
         return pathToTarget.getNodes().get(pathToTarget.getNodes().size() - 1);
     }

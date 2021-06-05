@@ -38,6 +38,7 @@ public class Launch extends Boot {
     private static Properties simulationProperties;
 
     private static ArrayList<Vehicle> vehicleAgents;
+    private static ArrayList<RequestAgent> requestAgents;
     private static ArrayList<AgentController> agentsController;
 
     private static void createSimulationContainer(boolean gui) {
@@ -156,6 +157,7 @@ public class Launch extends Boot {
     private static int parseRequesterAgents(Document agentsFile) {
         NodeList agentsList = agentsFile.getElementsByTagName("requester");
         int numberOfAgents = 0;
+        requestAgents = new ArrayList<RequestAgent>(agentsList.getLength());
 
         for(int i = 0; i < agentsList.getLength(); i++) {
             Node agent = agentsList.item(i);
@@ -173,6 +175,7 @@ public class Launch extends Boot {
                 try {
                     requester = new RequestAgent(i+1, name, random, random.equals("1") ? numberOfRequests : requestFile, heuristic);
                     agentsController.add(simulationContainerController.acceptNewAgent(name, requester));
+                    requestAgents.add(requester);
                     numberOfAgents++;
                 } catch (Exception e) {
                     log(e.getMessage());
@@ -220,11 +223,16 @@ public class Launch extends Boot {
         }
     }
 
-    private static void addGuiReferenceAndSetUtilityNodes(DistributedLogistics g) {
+    private static void addGraphParametersToVehicle() {
         for(Vehicle v: vehicleAgents) {
             v.setGasStations(Graph.getInstance().getGasStations());
             v.setHq(Graph.getInstance().getHeadQuarter());
-            v.setGui(g);
+        }
+    }
+
+    private static void addGuiReferenceToRequesters(DistributedLogistics g) {
+        for(RequestAgent ra : requestAgents) {
+            ra.setGui(g);
         }
     }
 
@@ -244,9 +252,11 @@ public class Launch extends Boot {
             System.exit(0);
         }
 
+        addGraphParametersToVehicle();
+
         try {
             DistributedLogistics d = new DistributedLogistics(vehicleAgents);
-            addGuiReferenceAndSetUtilityNodes(d);
+            addGuiReferenceToRequesters(d);
         } catch (Exception e) {
             log("GUI exception: " + e.getMessage());
             System.exit(0);

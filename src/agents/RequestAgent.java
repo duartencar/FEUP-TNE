@@ -1,7 +1,8 @@
 package agents;
 
 import behaviours.MakeContractRequests;
-import behaviours.RequestBehaviour;
+
+import gui.DistributedLogistics;
 import jade.core.AID;
 import logic.Proposal;
 import logic.Request;
@@ -17,7 +18,6 @@ import org.w3c.dom.NodeList;
 import utils.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static utils.Constants.AgentsProperties.RequestAgent.*;
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_TYPE;
@@ -32,6 +32,7 @@ public class RequestAgent extends Elementary {
     final private char heuristic;
     final private ArrayList<Request> requests;
     public int currentRequest = 0;
+    DistributedLogistics gui;
 
     public RequestAgent(int id, String name, String randomRequests, String fileOrNumberOfRequests, char heuristic) throws Exception {
         this.id=id;
@@ -64,6 +65,14 @@ public class RequestAgent extends Elementary {
         }
     }
 
+    public DistributedLogistics getGui() {
+        return gui;
+    }
+
+    public void setGui(DistributedLogistics g) {
+        this.gui = g;
+    }
+
     public ArrayList<Request> getRequests() {
         return requests;
     }
@@ -78,7 +87,7 @@ public class RequestAgent extends Elementary {
 
     protected void setup() {
         if(requests.size() > 0) {
-            addBehaviour(new MakeContractRequests(this, 1000));
+            addBehaviour(new MakeContractRequests(this, 1000 + id * 10));
         }
         else {
             log("Didn't have requests.");

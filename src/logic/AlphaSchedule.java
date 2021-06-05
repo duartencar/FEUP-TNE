@@ -18,11 +18,55 @@ public class AlphaSchedule {
         this.startPosition = startPosition;
     }
 
-    public short getTotalScheduleCost() {
+    public Task getLastTask() {
+        return tasks.lastElement();
+    }
+
+    public int getTotalBoxesCarried() {
+        int sum = 0;
+
+        for(Task t : tasks) {
+            sum += t.getLoad();
+        }
+
+        return sum;
+    }
+
+    public float getTotalFuelConsumed() {
+        float sum = 0;
+
+        for(Task t : tasks) {
+            sum += t.getNecessaryFuel();
+        }
+
+        return sum;
+    }
+
+    public float getTotalDistance() {
+        float sum = 0;
+
+        for(Task t : tasks) {
+            sum += t.getDistanceToComplete();
+        }
+
+        return sum;
+    }
+
+    public float getTotalExpense() {
+        float sum = 0;
+
+        for(Task t : tasks) {
+            sum += t.getExpense();
+        }
+
+        return sum;
+    }
+
+    public short getTotalScheduleDuration() {
         short sum = 0;
 
         for(Task t : tasks) {
-            sum += t.getCost();
+            sum += t.getMinutes();
         }
 
         return sum;

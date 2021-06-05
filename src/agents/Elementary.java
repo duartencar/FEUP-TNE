@@ -86,7 +86,6 @@ public abstract class Elementary extends Agent {
     }
 
     public synchronized void log(String message) {
-        Date a = new Date();
-        System.out.println(a.toString() + " -> " + getLocalName() + ": " + message);
+        System.out.println(getLocalName() + ": " + message);
     }
 }

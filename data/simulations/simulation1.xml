@@ -7,6 +7,6 @@
     </vehicles>
     <requesters>
         <requester name="req1" random="0" requestsFile="sim1_req.xml" heuristic='D' />
-        <requester name="req2" random="0" requestsFile="sim1_req.xml" heuristic='C' />
+        <requester name="req2" random="0" requestsFile="sim1_req.xml" heuristic='D' />
     </requesters>
 </experiment>
