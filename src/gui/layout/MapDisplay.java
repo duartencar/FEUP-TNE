@@ -1,7 +1,6 @@
 package gui.layout;
 
 import agents.Vehicle;
-import logic.Task;
 import map.Graph;
 import map.ui.UiGraph;
 import map.ui.UiNode;

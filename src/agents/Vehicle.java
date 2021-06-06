@@ -4,12 +4,11 @@ import behaviours.VehicleReceiveBehaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import gui.DistributedLogistics;
 import logic.*;
-
 import map.Graph;
 import map.GraphNode;
 import map.search.DijkstraGraph;
+import utils.Utils;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -21,9 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_NAME;
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_TYPE;
-
-import utils.Utils;
-
 import static utils.Constants.AgentsProperties.VehicleAgent.VehicleProperties.*;
 import static utils.Utils.generateFloat;
 
@@ -162,7 +158,7 @@ public class Vehicle extends Elementary {
             float deliveryDistance = deliveryCosts[1] / 100.0f; // divide pixel distance for 100 to get distance in km
             float deliveryConsumption = consumption(deliveryDistance);
             float deliveryBudget = budget(deliveryConsumption);
-            Task t = new Task(p, -1, new Date(simulationStartTime + (p.getWeight() * 60 * 1000)), 0, deliveryDistance, deliveryConsumption, deliveryBudget);
+            Task t = new Task(p, -1, new Date(schedule.getLastTaskDeliveryTime().getTime() + (deliveryMinutes * 60 * 1000)), 0, deliveryDistance, deliveryConsumption, deliveryBudget);
             schedule.addTask(t);
         } catch (Exception e) {
             log("Couldn't create task.");
@@ -201,6 +197,7 @@ public class Vehicle extends Elementary {
         int[] deliveryCosts = goesToHq ? Graph.getInstance().getPathCosts(deliveryPath) : Graph.getInstance().getPathCosts(p.getProposedPath());
         int[] tripToHqCosts = goesToHq ? Graph.getInstance().getPathCosts(hqPath) : null;
 
+
         int deliveryMinutes = deliveryCosts[0];
         float deliveryDistance = deliveryCosts[1] / 100.0f; // divide pixel distance for 100 to get distance in km
         float deliveryConsumption = consumption(deliveryDistance);
@@ -211,6 +208,8 @@ public class Vehicle extends Elementary {
         float hqConsumption = goesToHq ? consumption(hqDistance) : 0;
         float hqBudget = goesToHq ? budget(hqConsumption) : 0;
 
+        Date deliveryDate = new Date(schedule.getLastTaskDeliveryTime().getTime() + ((goesToHq ? hqMinutes + deliveryMinutes : deliveryMinutes)  * 60 * 1000));
+        Date hqDate = new Date(schedule.getLastTaskDeliveryTime().getTime() + hqMinutes * 60 * 1000);
         //log("\ntrying to add " + p.getProposedPath().get(0) + " -> " + p.getProposedPath().get(p.getProposedPath().size() - 1));
 
         try {
@@ -218,7 +217,7 @@ public class Vehicle extends Elementary {
             Path pathToHq = goesToHq ? new Path(hqPath) : null;
             delivery = new Task(pathToDelivery,
                                 p.getCfpId(),
-                                new Date(simulationStartTime + (deliveryMinutes * 60 * 1000)),
+                                deliveryDate,
                                 calls.get(p.getCfpId()).getNumBoxes(),
                                 deliveryDistance,
                                 deliveryConsumption,
@@ -226,7 +225,7 @@ public class Vehicle extends Elementary {
 
             gas = goesToHq ? new Task(pathToHq,
                             p.getCfpId(),
-                            new Date(simulationStartTime + (hqMinutes * 60 * 1000)),
+                            hqDate,
                             0,
                             hqDistance,
                             hqConsumption,
@@ -241,18 +240,9 @@ public class Vehicle extends Elementary {
             return false;
         }
 
-        //log("Schedule after " + schedule.toString());
-
-        currentLoad += calls.get(p.getCfpId()).getNumBoxes();
-        distanceCovered += p.getTotalDistance();
-        fuelConsumed += p.getConsumption();
-        fuelExpenses += p.getPrice();
-
         if(maxCapacity - schedule.getLoadSinceLastTripToHeadQuarters() < 6) {
             goToHeadQuarters();
         }
-
-        //log("My load is " + currentLoad + " and my total space is " + maxCapacity);
 
         return true;
     }
@@ -355,6 +345,8 @@ public class Vehicle extends Elementary {
         float hqConsumption = 0;
         float hqBudget = 0;
 
+
+
         if(pathToHeadQuarters != null) {
             tripToHqCosts = Graph.getInstance().getPathCosts(pathToHeadQuarters);
             hqMinutes = tripToHqCosts[0];
@@ -371,12 +363,15 @@ public class Vehicle extends Elementary {
             log("added previous trip to HQ");
         }
 
+        Date arrival = new Date(schedule.getLastTaskDeliveryTime().getTime() + ((hqMinutes + deliveryMinutes)  * 60 * 1000));
+
 
         Proposal toPropose = new Proposal(
                                             cfp.getId(),
                                             cfp.getParentId(),
                                             getAID(),
                                             pathToHeadQuarters != null ? mergePaths(pathToHeadQuarters, pathToDelivery) : pathToDelivery,
+                                            arrival,
                                             load,
                                             hqMinutes + deliveryMinutes,
                                             hqDistance + deliveryDistance,

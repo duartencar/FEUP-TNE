@@ -1,12 +1,11 @@
 package gui;
 
-import javax.swing.*;
-
 import agents.Vehicle;
 import gui.layout.AgentsPanel;
 import gui.layout.MapDisplay;
 
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class DistributedLogistics {

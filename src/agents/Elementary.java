@@ -3,13 +3,13 @@ package agents;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.*;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
 public abstract class Elementary extends Agent {
     protected ArrayList<AID> logisticsAgents;

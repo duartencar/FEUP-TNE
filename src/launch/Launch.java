@@ -1,9 +1,8 @@
 package launch;
 
 import agents.RequestAgent;
-import gui.DistributedLogistics;
 import agents.Vehicle;
-
+import gui.DistributedLogistics;
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -12,25 +11,22 @@ import jade.util.ExtendedProperties;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
-
 import map.Graph;
 import map.GraphNode;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import utils.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import utils.Utils;
 import static utils.Constants.Arguments.*;
 import static utils.Constants.Directories.MAPS_PATH;
 import static utils.Constants.Directories.SIMULATIONS_PATH;
 import static utils.Utils.*;
-import static utils.Utils.convertToFloat;
 
 public class Launch extends Boot {
     private static ProfileImpl simulationProfile;

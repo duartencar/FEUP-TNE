@@ -6,7 +6,8 @@ import org.w3c.dom.NodeList;
 
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class UtilsTest {
 

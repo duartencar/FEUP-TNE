@@ -2,7 +2,8 @@ package map;
 
 import java.util.ArrayList;
 
-import static utils.Utils.*;
+import static utils.Utils.convertToFloat;
+import static utils.Utils.log;
 
 public class GraphNode extends GraphElement {
 

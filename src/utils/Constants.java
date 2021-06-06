@@ -1,7 +1,5 @@
 package utils;
 
-import java.awt.*;
-
 public final class Constants {
 
     public final class Arguments {

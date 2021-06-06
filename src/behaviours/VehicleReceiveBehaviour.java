@@ -8,14 +8,8 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetResponder;
 import logic.Cfp;
 import logic.Proposal;
-import logic.Request;
-import map.Graph;
-import map.GraphNode;
 
 import java.io.IOException;
-import java.util.Map;
-
-import static utils.Utils.convertToInteger;
 
 public class VehicleReceiveBehaviour extends ContractNetResponder {
     private final Vehicle parent;
@@ -44,7 +38,7 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
                 reply.setPerformative(ACLMessage.PROPOSE);
                 final Proposal answer = parent.handleCallForProposal(requestToAnswer);
                 reply.setContentObject(answer);
-                parent.log("SENT: " + answer.toString());
+                //parent.log("SENT: " + answer.toString());
 
                 return reply;
             }catch (UnreadableException e) {
@@ -76,7 +70,7 @@ public class VehicleReceiveBehaviour extends ContractNetResponder {
 
             if(parent.addAcceptedProposalToSchedule(doneProposal)) {
                 inform.setPerformative(ACLMessage.INFORM);
-                parent.log("Accepted new proposal, my shcedule now is: " + parent.getSchedule().toString());
+                // parent.log("Accepted new proposal, my shcedule now is: " + parent.getSchedule().toString());
             }
             else {
                 inform.setPerformative(ACLMessage.FAILURE);

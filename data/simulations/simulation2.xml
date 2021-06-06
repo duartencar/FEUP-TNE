@@ -6,7 +6,7 @@
         <vehicle name="van3" type="electric" tank="300" capacity="50" pathFinding="Dijkstra" startNode="5" color="0 247 255"/>
     </vehicles>
     <requesters>
-        <requester name="req1" random="0" requestsFile="sim2_req.xml" heuristic='S' />
-        <requester name="req2" random="0" requestsFile="sim2_req.xml" heuristic='S' />
+        <requester name="req1" random="0" requestsFile="sim2_req.xml" heuristic='A' />
+        <requester name="req2" random="0" requestsFile="sim2_req.xml" heuristic='A' />
     </requesters>
 </experiment>

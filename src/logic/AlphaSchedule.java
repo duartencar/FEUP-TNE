@@ -25,6 +25,10 @@ public class AlphaSchedule {
         return tasks.lastElement();
     }
 
+    public Date getLastTaskDeliveryTime() {
+        return tasks.isEmpty() ? scheduleStart : getLastTask().getDeliveryTime();
+    }
+
     public int getTotalBoxesCarried() {
         int sum = 0;
 

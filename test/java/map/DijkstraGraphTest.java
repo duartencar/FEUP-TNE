@@ -1,12 +1,10 @@
 package map;
 
 import map.search.DijkstraGraph;
-
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import utils.Utils;
-
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 

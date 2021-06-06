@@ -7,7 +7,8 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetInitiator;
 import logic.Proposal;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 public class RequestBehaviour extends ContractNetInitiator {
     private int nResponders;

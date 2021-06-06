@@ -1,20 +1,16 @@
 package agents;
 
 import behaviours.MakeContractRequests;
-
 import gui.DistributedLogistics;
 import jade.core.AID;
 import logic.Proposal;
 import logic.Request;
-
 import map.Graph;
 import map.GraphNode;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import utils.Utils;
 
 import java.util.ArrayList;
@@ -22,8 +18,8 @@ import java.util.ArrayList;
 import static utils.Constants.AgentsProperties.RequestAgent.*;
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_TYPE;
 import static utils.Constants.Directories.SIMULATIONS_DATA_PATH;
-import static utils.Utils.*;
 import static utils.Utils.convertToInteger;
+import static utils.Utils.generateInt;
 
 public class RequestAgent extends Elementary {
     final private int id;
@@ -174,6 +170,10 @@ public class RequestAgent extends Elementary {
         return p.getMinutes() / p.getTotalDistance();
     }
 
+    float arrivalTime(Proposal p) {
+        return (float)p.getArrivalTime().getTime();
+    }
+
     public float evaluateProposal(Proposal p) {
         float evaluation = Float.MAX_VALUE;
 
@@ -189,6 +189,9 @@ public class RequestAgent extends Elementary {
                 break;
             case 'S':
                 evaluation = speed(p);
+                break;
+            case 'A':
+                evaluation = arrivalTime(p);
                 break;
             default:
                 evaluation = absoluteDistanceHeuristic(p);
