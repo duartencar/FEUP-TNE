@@ -26,6 +26,10 @@ public class ComplexRequestAgent extends RequestAgent {
         cfpProposalsStorage.put(cfpId, proposals);
     }
 
+    public Proposal getCurrentBestProposal(int cfpId) {
+        return cfpProposalsStorage.get(cfpId).get(0);
+    }
+
     public void addProposalForCfp(int cfpId, Proposal p) {
         ArrayList<Proposal> proposalsForCfp = cfpProposalsStorage.get(cfpId);
         Proposal toCompare;
