@@ -28,13 +28,12 @@ public class AnswerComplexCfps extends CyclicBehaviour {
         String conversationId;
 
         if(message != null) {
-            v.log("Received message from " + message.getSender().getLocalName());
             reply = message.createReply();
             reply.setPerformative(ACLMessage.REFUSE);
             conversationId = message.getConversationId();
 
             if(v.hasReceivedCfpForId(Integer.parseInt(conversationId))) {
-                v.log("Repeated  cfp");
+                v.log("Repeated cfp");
             }
             else {
                 try {
@@ -42,7 +41,7 @@ public class AnswerComplexCfps extends CyclicBehaviour {
                     reply.setPerformative(ACLMessage.PROPOSE);
                     final Proposal answer = v.handleCallForProposal(requestToAnswer);
                     reply.setContentObject(answer);
-                    v.log("SENT: " + answer.toString());
+                    v.log("answered cfp " + requestToAnswer.getId());
                 } catch (UnreadableException | IOException e) {
                     v.log("There was an error");
                     v.log(e.getMessage());

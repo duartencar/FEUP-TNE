@@ -52,9 +52,15 @@ public class MakeComplexCfp extends TickerBehaviour {
 
             p.send(msg);
 
-            p.log("Starting CFP for " + p.getVehicles().size()+ " vehicles:" + cfp.toString());
+            p.log("Starting CFP for cfp " + cfp.getId());
 
-            //p.addBehaviour(new RequestBehaviour(p, msg, vehicles.size()));
+            p.setExpectedAnswersForCfpId(cfp.getId(), vehicles.size());
+
+            p.initializeProposalsStorage(cfp.getId(), vehicles.size());
+
+            p.initializeNumberOfAnswersCounterForCfp(cfp.getId());
+
+            p.addBehaviour(new HandleAllComplexResponses(p, cfp.getId()));
 
             p.currentRequest++;
         }
