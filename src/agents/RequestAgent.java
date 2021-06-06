@@ -22,11 +22,11 @@ import static utils.Utils.convertToInteger;
 import static utils.Utils.generateInt;
 
 public class RequestAgent extends Elementary {
-    final private int id;
-    final private String agentName;
-    final private int mode;
-    final private char heuristic;
-    final private ArrayList<Request> requests;
+    final protected int id;
+    final protected String agentName;
+    final protected int mode;
+    final protected char heuristic;
+    final protected ArrayList<Request> requests;
     public int currentRequest = 0;
     DistributedLogistics gui;
 
@@ -90,7 +90,7 @@ public class RequestAgent extends Elementary {
         }
     }
 
-    private boolean parseRequests(Document requestsDoc) {
+    protected boolean parseRequests(Document requestsDoc) {
         final NodeList requestList = requestsDoc.getElementsByTagName("request");
         int numberOfBoxes, destinationId;
         GraphNode destinationNode;
@@ -140,11 +140,11 @@ public class RequestAgent extends Elementary {
         return requests.size() > 0;
     }
 
-    private Request generateRequest(int requestId, int numBoxes, GraphNode location, String deliveryTime) {
+    protected Request generateRequest(int requestId, int numBoxes, GraphNode location, String deliveryTime) {
         return new Request(id * AGENT_DOMAIN + requestId, id, numBoxes, location, 10);
     }
 
-    private void generateRandomRequests(int numberOfRequestsToGenerate) {
+    protected void generateRandomRequests(int numberOfRequestsToGenerate) {
 
         Graph g = Graph.getInstance();
 

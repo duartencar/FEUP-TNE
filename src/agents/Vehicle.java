@@ -24,18 +24,18 @@ import static utils.Constants.AgentsProperties.VehicleAgent.VehicleProperties.*;
 import static utils.Utils.generateFloat;
 
 public class Vehicle extends Elementary {
-    private final GraphNode startPosition;
-    private final String type;
-    private final String name;
-    private final float tankSize;
-    private final float maxCapacity;
-    private TreeSet<Integer> gasStations;
-    private int hq;
-    private AlphaSchedule schedule;
-    private ConcurrentHashMap<Integer, Proposal> proposals;
-    private ConcurrentHashMap<Integer, Cfp> calls;
+    protected final GraphNode startPosition;
+    protected final String type;
+    protected final String name;
+    protected final float tankSize;
+    protected final float maxCapacity;
+    protected TreeSet<Integer> gasStations;
+    protected int hq;
+    protected AlphaSchedule schedule;
+    protected ConcurrentHashMap<Integer, Proposal> proposals;
+    protected ConcurrentHashMap<Integer, Cfp> calls;
     public Color agentColor;
-    private long simulationStartTime;
+    protected long simulationStartTime;
 
     public Vehicle(String n, String t, GraphNode sp, float ts, float mc) {
         name = n;

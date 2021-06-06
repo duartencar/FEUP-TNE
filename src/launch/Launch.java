@@ -1,5 +1,7 @@
 package launch;
 
+import agents.ComplexRequestAgent;
+import agents.ComplexVehicle;
 import agents.RequestAgent;
 import agents.Vehicle;
 import gui.DistributedLogistics;
@@ -86,9 +88,13 @@ public class Launch extends Boot {
 
     private static int parseVehicleAgents(Document agentsFile) {
         NodeList agentsList = agentsFile.getElementsByTagName("vehicle");
+        boolean complex = false;
+        if(agentsList.getLength() == 0) {
+            agentsList = agentsFile.getElementsByTagName("complexvehicle");
+            complex = true;
+        }
 
         vehicleAgents = new ArrayList<Vehicle>(agentsList.getLength());
-
 
         int numberOfAgents = 0;
         int r, g, b;
@@ -135,7 +141,7 @@ public class Launch extends Boot {
                 }
 
                 try {
-                    Vehicle vehicle = new Vehicle(name, vehicleType, startPos, convertToFloat(tank), convertToFloat(capacity));
+                    Vehicle vehicle = complex ? new ComplexVehicle(name, vehicleType, startPos, convertToFloat(tank), convertToFloat(capacity)) : new Vehicle(name, vehicleType, startPos, convertToFloat(tank), convertToFloat(capacity));
                     vehicle.setColor(new Color(r, g, b));
                     vehicleAgents.add(vehicle);
                     agentsController.add(simulationContainerController.acceptNewAgent(name, vehicle));
@@ -152,6 +158,13 @@ public class Launch extends Boot {
 
     private static int parseRequesterAgents(Document agentsFile) {
         NodeList agentsList = agentsFile.getElementsByTagName("requester");
+        boolean complex = false;
+
+        if(agentsList.getLength() == 0) {
+            agentsList = agentsFile.getElementsByTagName("complexrequester");
+            complex = true;
+        }
+
         int numberOfAgents = 0;
         requestAgents = new ArrayList<RequestAgent>(agentsList.getLength());
 
@@ -166,10 +179,11 @@ public class Launch extends Boot {
                 String numberOfRequests = element.getAttribute("numberOfRequests");
                 String requestFile = element.getAttribute("requestsFile");
                 char heuristic = element.getAttribute("heuristic").charAt(0);
+                String randomOrRequestFile = random.equals("1") ? numberOfRequests : requestFile;
 
                 RequestAgent requester = null;
                 try {
-                    requester = new RequestAgent(i+1, name, random, random.equals("1") ? numberOfRequests : requestFile, heuristic);
+                    requester = complex ? new ComplexRequestAgent(i+1, name, random, randomOrRequestFile, heuristic) : new RequestAgent(i+1, name, random, randomOrRequestFile, heuristic);
                     agentsController.add(simulationContainerController.acceptNewAgent(name, requester));
                     requestAgents.add(requester);
                     numberOfAgents++;
