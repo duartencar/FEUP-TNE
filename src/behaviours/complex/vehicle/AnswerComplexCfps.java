@@ -1,4 +1,4 @@
-package behaviours.complex;
+package behaviours.complex.vehicle;
 
 import agents.ComplexVehicle;
 import jade.core.behaviours.CyclicBehaviour;

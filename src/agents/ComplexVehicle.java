@@ -1,6 +1,6 @@
 package agents;
 
-import behaviours.complex.AnswerComplexCfps;
+import behaviours.complex.vehicle.AnswerComplexCfps;
 import map.GraphNode;
 import utils.Utils;
 

@@ -1,6 +1,6 @@
 package agents;
 
-import behaviours.complex.MakeComplexCfp;
+import behaviours.complex.requester.MakeComplexCfp;
 import logic.Proposal;
 
 import java.util.ArrayList;
