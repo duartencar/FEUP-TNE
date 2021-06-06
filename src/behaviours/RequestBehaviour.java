@@ -19,11 +19,6 @@ public class RequestBehaviour extends ContractNetInitiator {
         this.parent = p;
         nResponders = numberOfResponders;
     }
-/*
-    private int numBoxes;
-    private GraphNode destination;
-    private int deliveryTime;
-*/
 
     protected void handleFailure(ACLMessage failure) {
         if (failure.getSender().equals(myAgent.getAMS())) {

@@ -34,6 +34,7 @@ public class Task {
     public int getLoad() {
         return load;
     }
+
     public int getMinutes() {
         return minutes;
     }
@@ -72,10 +73,6 @@ public class Task {
 
     public Date getDeliveryTime() {
         return deliveryTime;
-    }
-
-    public int compareTo(Task sc) {
-        return deliveryTime.compareTo(sc.getDeliveryTime());
     }
 
     public String toString() {

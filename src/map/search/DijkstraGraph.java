@@ -98,8 +98,6 @@ public class DijkstraGraph {
             }
         }
 
-        reset();
-
         begin.distance = 0;
 
         addToQueue(begin);
@@ -167,8 +165,6 @@ public class DijkstraGraph {
             return null;
         }
 
-        reset();
-
         begin.distance = 0;
 
         addToQueue(begin);
@@ -225,7 +221,6 @@ public class DijkstraGraph {
         if(start == end) {
             return new ArrayList<Integer>();
         }
-        reset();
 
         ArrayList<Integer> answer = new ArrayList<Integer>(2);
         DijkstraNode begin = nodes.get(start);

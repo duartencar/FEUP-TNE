@@ -29,15 +29,8 @@ public class Vehicle extends Elementary {
     private final String name;
     private final float tankSize;
     private final float maxCapacity;
-    private float currentLoad;
-    private float distanceCovered = 0;
-    private float fuelConsumed = 0;
-    private float fuelExpenses = 0;
-    private float profit;
     private TreeSet<Integer> gasStations;
     private int hq;
-    private ArrayList<Request> requests;
-    private DijkstraGraph searchGraph;
     private AlphaSchedule schedule;
     private ConcurrentHashMap<Integer, Proposal> proposals;
     private ConcurrentHashMap<Integer, Cfp> calls;
@@ -50,11 +43,7 @@ public class Vehicle extends Elementary {
         startPosition = sp;
         tankSize = ts;
         maxCapacity = mc;
-        profit = 0;
-        currentLoad = 0;
-        requests = new ArrayList<Request>();
         agentColor = new Color(generateFloat(), generateFloat(), generateFloat());
-        searchGraph = Graph.getInstance().getGraphToSearch();
         gasStations = new TreeSet<Integer>();
         proposals = new ConcurrentHashMap<Integer, Proposal>();
         simulationStartTime = Calendar.getInstance().getTimeInMillis();
@@ -105,45 +94,12 @@ public class Vehicle extends Elementary {
         return startPosition;
     }
 
-    public String getVehicleName() {
-        return name;
-    }
-
     public String getType() {
         return type;
     }
 
     public double getTankSize() {
         return tankSize;
-    }
-
-    public double getMaxCapacity() {
-        return maxCapacity;
-    }
-
-    public double getCurrentLoad() {
-        return currentLoad;
-    }
-
-    public void setCurrentLoad(float currentLoad) {
-        this.currentLoad = currentLoad;
-    }
-
-    public double getProfit() {
-        return profit;
-    }
-
-    public void setProfit(float profit) {
-        this.profit = profit;
-    }
-
-    public ArrayList<Request> getRequests() {
-        return requests;
-    }
-
-    public void getGas() {
-        int lastTaskDestination = schedule.getLastTaskDestination();
-        ArrayList<Integer> path = Graph.getInstance().getGraphToSearch().getPathToNearestGasStation(lastTaskDestination);
     }
 
     public void goToHeadQuarters() {
@@ -307,12 +263,7 @@ public class Vehicle extends Elementary {
     }
 
     public Proposal handleCallForProposal(Cfp cfp) {
-        //TODO: use a pathfinding algorithm to see how long it would take for it to distribute the request
-        /*
-        distance traveled: 25
-        loadIfAccepts: 85%
-	    costIfAccepts: 8€
-         */
+
         DijkstraGraph g = Graph.getInstance().getGraphToSearch();
         ArrayList<Integer> pathToDelivery, pathToGasStation, pathToHeadQuarters = null;
         float remainingFuel = tankSize - schedule.getConsumedFuelSinceLastTripToGasStation();
@@ -322,7 +273,6 @@ public class Vehicle extends Elementary {
         if(remainingSpace < cfp.getNumBoxes()) {
             int lastTaskDestination = schedule.getLastTaskDestination();
             pathToHeadQuarters = g.findPathToHq(lastTaskDestination);
-            log("I have to go to HQ to make delivery " + cfp.getId());
         }
 
         headQuartersId = pathToHeadQuarters != null ? pathToHeadQuarters.get(pathToHeadQuarters.size() - 1) : -1;
@@ -345,22 +295,18 @@ public class Vehicle extends Elementary {
         float hqConsumption = 0;
         float hqBudget = 0;
 
-
-
         if(pathToHeadQuarters != null) {
             tripToHqCosts = Graph.getInstance().getPathCosts(pathToHeadQuarters);
             hqMinutes = tripToHqCosts[0];
             hqDistance = tripToHqCosts[1] / 100.0f;
             hqConsumption = consumption(hqDistance);
             hqBudget = budget(hqConsumption);
-            log("added path to headquarters");
         }
         else if(schedule.getLastTaskDestination() == hq) {
             hqMinutes = schedule.getLastTask().getMinutes();
             hqDistance = schedule.getLastTask().getDistanceToComplete();
             hqConsumption = schedule.getLastTask().getNecessaryFuel();
             hqBudget = schedule.getLastTask().getExpense();
-            log("added previous trip to HQ");
         }
 
         Date arrival = new Date(schedule.getLastTaskDeliveryTime().getTime() + ((hqMinutes + deliveryMinutes)  * 60 * 1000));

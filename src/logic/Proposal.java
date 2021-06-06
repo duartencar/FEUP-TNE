@@ -47,24 +47,12 @@ public class Proposal implements Serializable {
         return cfpId;
     }
 
-    public int getLoadIfAccepts() {
-        return loadIfAccepts;
-    }
-
-    public int getCfpParentId() {
-        return cfpParentId;
-    }
-
     public int getMinutes() {
         return minutes;
     }
 
     public float getTotalDistance() {
         return totalDistance;
-    }
-
-    public float getConsumption() {
-        return consumption;
     }
 
     public float getPrice() {

@@ -33,31 +33,11 @@ public class Cfp implements Serializable {
         return parentId;
     }
 
-    public void setParentId(int parentId) {
-        this.parentId = parentId;
-    }
-
     public int getNumBoxes() {
         return numBoxes;
     }
 
-    public void setNumBoxes(int numBoxes) {
-        this.numBoxes = numBoxes;
-    }
-
     public int getDestination() {
         return destination;
-    }
-
-    public void setDestination(int destination) {
-        this.destination = destination;
-    }
-
-    public int getDeliveryTime() {
-        return deliveryTime;
-    }
-
-    public void setDeliveryTime(int deliveryTime) {
-        this.deliveryTime = deliveryTime;
     }
 }

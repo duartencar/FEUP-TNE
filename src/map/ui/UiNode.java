@@ -32,7 +32,10 @@ public class UiNode extends GraphElement {
     }
 
     public void setColor(Color c) {
-        color = c;
+
+        if(color != Color.BLUE && color != Color.RED) {
+            color = c;
+        }
     }
 
     public UiNode (int id, int x, int y) {
@@ -83,7 +86,11 @@ public class UiNode extends GraphElement {
             edge.paint(g);
         }
 
-        if(agentPos != null) {
+        if(color == Color.BLUE) {
+            g.setColor(color);
+            g.fillRect(x-RADIUS, y-RADIUS, RADIUS*2, RADIUS*2);
+        }
+        else if(agentPos != null) {
             g.setColor(agentPos);
             g.fillRect(x-RADIUS, y-RADIUS, RADIUS*2, RADIUS*2);
         }
