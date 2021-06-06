@@ -1,4 +1,4 @@
-package behaviours;
+package behaviours.simple;
 
 import agents.RequestAgent;
 import jade.core.AID;

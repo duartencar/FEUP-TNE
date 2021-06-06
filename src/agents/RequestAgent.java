@@ -1,6 +1,6 @@
 package agents;
 
-import behaviours.MakeContractRequests;
+import behaviours.simple.MakeContractRequests;
 import gui.DistributedLogistics;
 import jade.core.AID;
 import logic.Proposal;

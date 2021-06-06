@@ -1,6 +1,6 @@
 package agents;
 
-import behaviours.VehicleReceiveBehaviour;
+import behaviours.simple.VehicleReceiveBehaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;

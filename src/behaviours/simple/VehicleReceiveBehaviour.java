@@ -1,4 +1,4 @@
-package behaviours;
+package behaviours.simple;
 
 import agents.Vehicle;
 import jade.domain.FIPAAgentManagement.FailureException;
