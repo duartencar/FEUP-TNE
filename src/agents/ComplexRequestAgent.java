@@ -1,6 +1,7 @@
 package agents;
 
 import behaviours.complex.requester.MakeComplexCfp;
+import behaviours.simple.MakeContractRequests;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import logic.Proposal;
@@ -103,7 +104,7 @@ public class ComplexRequestAgent extends RequestAgent {
     protected void setup() {
         log("Hi I'm a complex requester");
         if(requests.size() > 0) {
-            addBehaviour(new MakeComplexCfp(this, 1000 + id * 10));
+            addBehaviour(new MakeContractRequests(this, 1000 + id * 10));
         }
         else {
             log("Didn't have requests.");

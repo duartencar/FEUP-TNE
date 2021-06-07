@@ -3,6 +3,7 @@ package behaviours.complex.requester;
 import agents.ComplexRequestAgent;
 import jade.core.AID;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import logic.Cfp;
 import logic.Request;
@@ -35,14 +36,14 @@ public class MakeComplexCfp extends TickerBehaviour {
 
         if(cfp != null) {
             ACLMessage msg = new ACLMessage(ACLMessage.CFP);
-            msg.setConversationId("" + cfp.getId());
+            msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+            msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+            msg.setConversationId(cfp.getId() + "");
             ArrayList<AID> vehicles = p.getVehicles();
 
             for(AID v : vehicles) {
                 msg.addReceiver(v);
             }
-
-            msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
             try {
                 msg.setContentObject(cfp);
@@ -60,7 +61,7 @@ public class MakeComplexCfp extends TickerBehaviour {
 
             p.initializeNumberOfAnswersCounterForCfp(cfp.getId());
 
-            p.addBehaviour(new HandleAllComplexResponses(p, cfp.getId()));
+            //p.addBehaviour(new ComplexRequestBehaviour(p, msg, vehicles.size()));
 
             p.currentRequest++;
         }

@@ -11,8 +11,8 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 public class RequestBehaviour extends ContractNetInitiator {
-    private int nResponders;
-    final private RequestAgent parent;
+    protected int nResponders;
+    final protected RequestAgent parent;
 
     public RequestBehaviour(RequestAgent p, ACLMessage msg, int numberOfResponders) {
         super(p, msg);
@@ -35,7 +35,6 @@ public class RequestBehaviour extends ContractNetInitiator {
 
     protected void handleRefuse(ACLMessage refuse) {
         System.out.println(refuse.getSender().getLocalName() + " refused to answer.");
-
     }
 
 

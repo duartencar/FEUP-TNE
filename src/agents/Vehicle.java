@@ -86,7 +86,7 @@ public class Vehicle extends Elementary {
 
         try {
             pw = new PrintWriter(RESULTS_PATH + name + ".csv");
-            pw.print("");
+            pw.print("Arrival Time,Request ID,Origin,Destination,Load,Duration (min),Distance(Km),Fuel,Cost(€)\n");
             pw.flush();
             pw.close();
         }catch (IOException e) {

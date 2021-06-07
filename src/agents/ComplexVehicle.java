@@ -1,8 +1,9 @@
 package agents;
 
-import behaviours.complex.vehicle.AnswerComplexCfps;
-import behaviours.complex.vehicle.HandleConfirmations;
-import behaviours.complex.vehicle.HandleRequestConfirmation;
+import behaviours.simple.VehicleReceiveBehaviour;
+import jade.domain.FIPANames;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import logic.Proposal;
 import map.GraphNode;
 import utils.Utils;
@@ -50,8 +51,10 @@ public class ComplexVehicle extends Vehicle {
         if (!registerInYellowPages(SERVICE_TYPE, SERVICE_NAME))
             Utils.print(name,"Failed to register to yellow pages services");
 
-        addBehaviour(new AnswerComplexCfps(this));
-        addBehaviour(new HandleRequestConfirmation(this));
-        addBehaviour(new HandleConfirmations(this));
+        MessageTemplate template = MessageTemplate.and(
+                MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
+                MessageTemplate.MatchPerformative(ACLMessage.CFP));
+
+        addBehaviour(new VehicleReceiveBehaviour(this, template));
     }
 }

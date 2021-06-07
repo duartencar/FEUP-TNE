@@ -12,8 +12,8 @@ import logic.Proposal;
 import java.io.IOException;
 
 public class VehicleReceiveBehaviour extends ContractNetResponder {
-    private final Vehicle parent;
-    private Cfp requestToAnswer = null;
+    protected final Vehicle parent;
+    protected Cfp requestToAnswer = null;
 
     public VehicleReceiveBehaviour(Vehicle a, MessageTemplate template) {
         super(a, template);
