@@ -51,8 +51,6 @@ public class AnswerComplexCfps extends CyclicBehaviour {
             }
             v.send(reply);
         }
-        else {
-            block();
-        }
+
     }
 }

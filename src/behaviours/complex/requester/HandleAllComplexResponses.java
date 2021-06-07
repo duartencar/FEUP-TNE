@@ -12,11 +12,13 @@ public class HandleAllComplexResponses extends CyclicBehaviour {
 
     ComplexRequestAgent p;
     private final MessageTemplate mt;
+    private long timeOut;
 
     public HandleAllComplexResponses(ComplexRequestAgent a, Integer cfpId) {
         super(a);
         p = a;
         mt = MessageTemplate.MatchConversationId(cfpId.toString());
+        timeOut = System.currentTimeMillis() + 1000;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class HandleAllComplexResponses extends CyclicBehaviour {
 
         if(msg != null) {
             int cfpId = Integer.parseInt(msg.getConversationId());
-            if (msg.getPerformative() == ACLMessage.PROPOSE) {
+            if (msg.getPerformative() == ACLMessage.PROPOSE && !p.doIAlreadyHaveAProposalFromThisVehicle(cfpId, msg.getSender())) {
                 try {
                     Proposal content = (Proposal)msg.getContentObject();
                     p.log("received proposal from " + msg.getSender().getLocalName() + " related to cfp " + msg.getConversationId());
@@ -40,12 +42,13 @@ public class HandleAllComplexResponses extends CyclicBehaviour {
                 p.someAgentRefusedToAnswerCfp(cfpId);
             }
 
-            if(p.cfpHasReceivedAllProposals(cfpId)) {
+            if(p.cfpHasReceivedAllProposals(cfpId) || System.currentTimeMillis() >= timeOut) {
                 p.log("Has received all answers");
+                p.addBehaviour(new HandleConfirmationResponses(p, cfpId));
+                p.sendQueryIf(cfpId);
+                p.removeBehaviour(this);
             }
         }
-        else {
-            block();
-        }
+
     }
 }

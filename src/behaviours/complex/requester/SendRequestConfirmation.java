@@ -12,15 +12,10 @@ public class SendRequestConfirmation extends OneShotBehaviour {
     public SendRequestConfirmation(ComplexRequestAgent requestAgent, int cfpId) {
         p = requestAgent;
         this.cfpId = cfpId;
+        p.log("SendRequestConfirmation");
     }
     @Override
     public void action() {
-        ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
-        Proposal bestProposal = p.getCurrentBestProposal(cfpId);
 
-        msg.setConversationId(cfpId.toString());
-        msg.addReceiver(bestProposal.getProposalParentId());
-
-        p.send(msg);
     }
 }

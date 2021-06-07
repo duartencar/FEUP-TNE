@@ -1,23 +1,59 @@
 package agents;
 
+import behaviours.complex.requester.HandleAllComplexResponses;
 import behaviours.complex.requester.MakeComplexCfp;
+import jade.core.AID;
+import jade.lang.acl.ACLMessage;
 import logic.Proposal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ComplexRequestAgent extends RequestAgent {
 
-    private ConcurrentHashMap<Integer, Integer> numberOfAnswers;
+    private HashMap<Integer, Integer> numberOfAnswers;
     private ConcurrentHashMap<Integer, Integer> expectedNumberOfAnswersForCfp;
     private ConcurrentHashMap<Integer, ArrayList<Proposal>> cfpProposalsStorage;
 
 
     public ComplexRequestAgent(int id, String name, String randomRequests, String fileOrNumberOfRequests, char heuristic) throws Exception {
         super(id, name, randomRequests, fileOrNumberOfRequests, heuristic);
-        numberOfAnswers = new ConcurrentHashMap<Integer, Integer>(requests.size());
+        numberOfAnswers = new HashMap<Integer, Integer>(requests.size());
         expectedNumberOfAnswersForCfp = new ConcurrentHashMap<Integer, Integer>(requests.size());
         cfpProposalsStorage = new ConcurrentHashMap<Integer, ArrayList<Proposal>>(requests.size());
+    }
+
+    public void removeProposalFrom(int cfpId, AID proposer) {
+        ArrayList<Proposal> proposalsForCfp = cfpProposalsStorage.get(cfpId);
+
+        Proposal rejected = proposalsForCfp.remove(0);
+
+        if(!rejected.getProposalParentId().equals(proposer)) {
+            log("Removed the wrong proposal");
+        }
+    }
+
+    public boolean doIAlreadyHaveAProposalFromThisVehicle(int cfpId, AID proposerId) {
+        ArrayList<Proposal> proposalsForCfp = cfpProposalsStorage.get(cfpId);
+
+        for(Proposal p : proposalsForCfp) {
+            if(p.getProposalParentId().equals(proposerId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean areProposalsLeftFor(int cfpId) {
+        ArrayList<Proposal> proposalsForCfp = cfpProposalsStorage.get(cfpId);
+
+        return proposalsForCfp.size() > 0;
+    }
+
+    public ArrayList<Proposal> removeProposalsFrom(int cfpId) {
+        return cfpProposalsStorage.remove(cfpId);
     }
 
     public void initializeProposalsStorage(int cfpId, int expectedNumberOfProposals) {
@@ -52,6 +88,17 @@ public class ComplexRequestAgent extends RequestAgent {
         }
     }
 
+    public void sendQueryIf(Integer cfpId) {
+        log("Sent query if");
+        ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
+        Proposal bestProposal = getCurrentBestProposal(cfpId);
+
+        msg.setConversationId(cfpId.toString());
+        msg.addReceiver(bestProposal.getProposalParentId());
+
+        send(msg);
+    }
+
 
     @Override
     protected void setup() {
@@ -74,6 +121,7 @@ public class ComplexRequestAgent extends RequestAgent {
 
     public void anotherAnswerToCfp(Integer cfpId) {
         numberOfAnswers.put(cfpId, numberOfAnswers.get(cfpId) + 1);
+        log(cfpId + " now has " + numberOfAnswers.get(cfpId));
     }
 
     public void initializeNumberOfAnswersCounterForCfp(Integer cfpId) {
@@ -81,7 +129,7 @@ public class ComplexRequestAgent extends RequestAgent {
     }
 
     public boolean cfpHasReceivedAllProposals(Integer cfpId) {
-        return expectedNumberOfAnswersForCfp.get(cfpId) == numberOfAnswers.get(cfpId);
+        return expectedNumberOfAnswersForCfp.get(cfpId) == numberOfAnswers.get(cfpId) && expectedNumberOfAnswersForCfp.get(cfpId) == cfpProposalsStorage.get(cfpId).size();
     }
 
 }

@@ -1,6 +1,10 @@
 package agents;
 
 import behaviours.complex.vehicle.AnswerComplexCfps;
+import behaviours.complex.vehicle.HandleConfirmations;
+import behaviours.complex.vehicle.HandleRequestConfirmation;
+import jade.lang.acl.ACLMessage;
+import logic.Proposal;
 import map.GraphNode;
 import utils.Utils;
 
@@ -16,6 +20,30 @@ public class ComplexVehicle extends Vehicle {
         return calls.get(cfpId) != null;
     }
 
+    public boolean doIHaveThisProposal(int cfpId) {
+        return proposals.get(cfpId) != null;
+    }
+
+    public Proposal removeProposal(int cfpId) {
+        return proposals.remove(cfpId);
+    }
+
+    public boolean doIHaveBetterProposals(int cfpId) {
+        Proposal toCompare = proposals.get(cfpId);
+
+        if(toCompare == null) {
+            return true;
+        }
+
+        for(Proposal p : proposals.values()) {
+            if(p.getMinutes() < toCompare.getMinutes()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public void setup() {
         log("Hi I'm a complex vehicle");
@@ -24,5 +52,7 @@ public class ComplexVehicle extends Vehicle {
             Utils.print(name,"Failed to register to yellow pages services");
 
         addBehaviour(new AnswerComplexCfps(this));
+        addBehaviour(new HandleRequestConfirmation(this));
+        addBehaviour(new HandleConfirmations(this));
     }
 }
