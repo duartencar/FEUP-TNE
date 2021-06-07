@@ -3,7 +3,6 @@ package agents;
 import behaviours.complex.vehicle.AnswerComplexCfps;
 import behaviours.complex.vehicle.HandleConfirmations;
 import behaviours.complex.vehicle.HandleRequestConfirmation;
-import jade.lang.acl.ACLMessage;
 import logic.Proposal;
 import map.GraphNode;
 import utils.Utils;

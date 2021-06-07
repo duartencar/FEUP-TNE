@@ -1,7 +1,6 @@
 package behaviours.complex.requester;
 
 import agents.ComplexRequestAgent;
-import agents.ComplexVehicle;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;

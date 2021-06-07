@@ -274,8 +274,6 @@ public class Launch extends Boot {
 
         startAgents();
 
-        log("gui");
-
         return;
     }
 }

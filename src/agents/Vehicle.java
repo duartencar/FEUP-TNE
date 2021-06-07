@@ -11,6 +11,10 @@ import map.search.DijkstraGraph;
 import utils.Utils;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_NAME;
 import static utils.Constants.AgentsProperties.VehicleAgent.SERVICE_TYPE;
 import static utils.Constants.AgentsProperties.VehicleAgent.VehicleProperties.*;
+import static utils.Constants.Directories.RESULTS_PATH;
 import static utils.Utils.generateFloat;
 
 public class Vehicle extends Elementary {
@@ -36,6 +41,7 @@ public class Vehicle extends Elementary {
     protected ConcurrentHashMap<Integer, Cfp> calls;
     public Color agentColor;
     protected long simulationStartTime;
+    protected File resultsFile;
 
     public Vehicle(String n, String t, GraphNode sp, float ts, float mc) {
         name = n;
@@ -53,12 +59,41 @@ public class Vehicle extends Elementary {
         if(startPosition.getId() != hq) {
             goToHeadQuarters();
         }
+
+        createResultsFile();
     }
 
     public void setGasStations(ArrayList<Integer> ids) {
         for(Integer id: ids) {
             gasStations.add(id);
         }
+    }
+
+    public void createResultsFile() {
+        resultsFile = new File(RESULTS_PATH + name + ".csv");
+        PrintWriter pw = null;
+
+        try {
+            if (resultsFile.createNewFile()) {
+                log("File created: " + resultsFile.getName());
+            } else {
+                log("File already exists.");
+            }
+        }
+        catch (IOException e) {
+            log("Error creating file: " + e.getMessage());
+        }
+
+        try {
+            pw = new PrintWriter(RESULTS_PATH + name + ".csv");
+            pw.print("");
+            pw.flush();
+            pw.close();
+        }catch (IOException e) {
+            log("failed to write to csv: " + e.getMessage());
+            return;
+        }
+
     }
 
     public void setHq(int hq) {
@@ -102,6 +137,21 @@ public class Vehicle extends Elementary {
         return tankSize;
     }
 
+    public void appendTaskToResultsFile(Task t) {
+        FileWriter pw = null;
+        final String stringToPrint = t.getStringToPrint();
+
+        try {
+            pw = new FileWriter(RESULTS_PATH + name + ".csv",true);
+            pw.append(stringToPrint);
+            pw.flush();
+            pw.close();
+        }catch (IOException e) {
+            log("failed to write to csv: " + e.getMessage());
+            return;
+        }
+    }
+
     public void goToHeadQuarters() {
         int lastTaskDestination = schedule.getLastTaskDestination();
         ArrayList<Integer> path = Graph.getInstance().getGraphToSearch().findPathToHq(lastTaskDestination);
@@ -114,16 +164,18 @@ public class Vehicle extends Elementary {
             float deliveryDistance = deliveryCosts[1] / 100.0f; // divide pixel distance for 100 to get distance in km
             float deliveryConsumption = consumption(deliveryDistance);
             float deliveryBudget = budget(deliveryConsumption);
-            Task t = new Task(p, -1, new Date(schedule.getLastTaskDeliveryTime().getTime() + (deliveryMinutes * 60 * 1000)), 0, deliveryDistance, deliveryConsumption, deliveryBudget);
+            final Task t = new Task(p, -1, new Date(schedule.getLastTaskDeliveryTime().getTime() + (deliveryMinutes * 60 * 1000)), 0, deliveryDistance, deliveryConsumption, deliveryBudget);
             schedule.addTask(t);
+            appendTaskToResultsFile(t);
+            /*new Thread(() -> {
+                appendTaskToResultsFile(t);
+            }).start();*/
         } catch (Exception e) {
             log("Couldn't create task.");
         }
     }
 
     public boolean addAcceptedProposalToSchedule(Proposal p) {
-
-        Task delivery = null, gas = null;
 
         if(p.getProposedPath().size() == 0) {
             log("Path with no steps");
@@ -171,7 +223,7 @@ public class Vehicle extends Elementary {
         try {
             Path pathToDelivery = new Path(goesToHq ? deliveryPath : p.getProposedPath());
             Path pathToHq = goesToHq ? new Path(hqPath) : null;
-            delivery = new Task(pathToDelivery,
+            final Task delivery = new Task(pathToDelivery,
                                 p.getCfpId(),
                                 deliveryDate,
                                 calls.get(p.getCfpId()).getNumBoxes(),
@@ -179,7 +231,7 @@ public class Vehicle extends Elementary {
                                 deliveryConsumption,
                                 deliveryBudget);
 
-            gas = goesToHq ? new Task(pathToHq,
+            final Task gas = goesToHq ? new Task(pathToHq,
                             p.getCfpId(),
                             hqDate,
                             0,
@@ -189,8 +241,16 @@ public class Vehicle extends Elementary {
 
             if(goesToHq) {
                 schedule.addTask(gas);
+                /*new Thread(() -> {
+                    appendTaskToResultsFile(gas);
+                }).start();*/
+                appendTaskToResultsFile(gas);
             }
             schedule.addTask(delivery);
+            appendTaskToResultsFile(delivery);
+            /*new Thread(() -> {
+                appendTaskToResultsFile(delivery);
+            }).start();*/
         } catch (Exception e) {
             log("Couldn't create task.");
             return false;

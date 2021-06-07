@@ -2,8 +2,6 @@ package behaviours.complex.requester;
 
 import agents.ComplexRequestAgent;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.lang.acl.ACLMessage;
-import logic.Proposal;
 
 public class SendRequestConfirmation extends OneShotBehaviour {
     ComplexRequestAgent p;

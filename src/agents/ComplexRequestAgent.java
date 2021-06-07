@@ -1,6 +1,5 @@
 package agents;
 
-import behaviours.complex.requester.HandleAllComplexResponses;
 import behaviours.complex.requester.MakeComplexCfp;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;

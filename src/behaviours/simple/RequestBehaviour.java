@@ -81,13 +81,13 @@ public class RequestBehaviour extends ContractNetInitiator {
         }
 
         if(accept != null) {
-            parent.log("Accepting proposal "+ bestProposal.toString() + " from vehicle " + bestProposer.getLocalName());
+            //parent.log("Accepting proposal "+ bestProposal.toString() + " from vehicle " + bestProposer.getLocalName());
             accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
         }
     }
 
     protected void handleInform(ACLMessage inform) {
-        parent.log("Agent scheduled task.");
+        //parent.log("Agent scheduled task.");
         // parent.getGui().addNewRequest(bestProposal.getProposedPath().get(bestProposal.getProposedPath().size() - 1));
         parent.getGui().update();
     }

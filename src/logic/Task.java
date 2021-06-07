@@ -31,6 +31,10 @@ public class Task {
         this.expense = expense;
     }
 
+    public String getStringToPrint() {
+        return deliveryTime.toString() + "," + requestId + "," + getStart().getId() + "," + getEnd().getId() + "," + load + "," + minutes + "," + distanceToComplete + "," + necessaryFuel + "," + expense + "\n";
+    }
+
     public int getLoad() {
         return load;
     }
