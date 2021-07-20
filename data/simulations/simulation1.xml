@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<experiment>
+    <vehicles>
+        <vehicle name="van1" type="electric" tank="300" capacity="50" pathFinding="Dijkstra" startNode="1" color="235 0 207" />
+        <vehicle name="van2" type="gas" tank="500" capacity="40" pathFinding="Dijkstra" startNode="4" color="0 255 68" />
+        <vehicle name="van3" type="diesel" tank="600" capacity="45" pathFinding="Dijkstra" startNode="5" color="0 247 255"/>
+    </vehicles>
+    <requesters>
+        <requester name="req1" random="1" numberOfRequests="10" heuristic='A' />
+        <requester name="req2" random="0" requestsFile="sim1_req.xml" heuristic='A' />
+    </requesters>
+</experiment>
